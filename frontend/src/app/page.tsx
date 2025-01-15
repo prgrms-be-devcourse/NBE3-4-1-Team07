@@ -1,40 +1,100 @@
+"use client";
 import Image from "next/image";
-'use client';
-import { useState } from 'react';
+import { useState } from "react";
 
-interface Product {
+type Product = {
   id: number;
   name: string;
   price: number;
+  quantity: number;
+  imgPath: string;
   description: string;
-}
+};
+
+type ProductResponseDto = {
+  products: Product[];
+};
+
+type OrderRequestDto = {
+  email: string;
+  address: string;
+  postalCode: string;
+  totalPrice: number;
+  products: Product[];
+};
 
 export default function Home() {
   const [cartItems, setCartItems] = useState<Product[]>([]);
   // 상품 목록 데이터 (예시)
   const products: Product[] = [
-    { id: 1, name: "스타벅스", price: 12000, description: "아메리카노" },
-    { id: 2, name: "이디야", price: 8000, description: "토피넛 라테" },
-    { id: 3, name: "커피빈", price: 6000, description: "카푸치노" },
-    { id: 4, name: "브루노", price: 9000, description: "브루노 마스" },
+    { 
+      id: 1, 
+      name: "스타벅스", 
+      price: 12000, 
+      description: "아메리카노",
+      quantity: 1,
+      imgPath: "/images/starbucks.jpg"
+    },
+    { 
+      id: 2, 
+      name: "이디야", 
+      price: 8000, 
+      description: "토피넛 라테",
+      quantity: 1,
+      imgPath: "/images/ediya.jpg"
+    },
+    { 
+      id: 3, 
+      name: "커피빈", 
+      price: 6000, 
+      description: "카푸치노",
+      quantity: 1,
+      imgPath: "/images/coffeebean.jpg"
+    },
+    { 
+      id: 4, 
+      name: "브루노", 
+      price: 9000, 
+      description: "브루노 마스",
+      quantity: 1,
+      imgPath: "/images/bruno.jpg"
+    }
   ];
-    const handleAddToCart = (product: Product) => {
-      setCartItems([...cartItems, product]);
-    };
-    const handleRemoveFromCart = (index: number) => {
-      setCartItems(cartItems.filter((_, i) => i !== index));
-    };
-    // 총 금액 계산 함수
-    const calculateTotal = () => {
-      return cartItems.reduce((sum, item) => sum + item.price, 0);
-    };
+  const handleAddToCart = (product: Product) => {
+    setCartItems([...cartItems, product]);
+  };
+  const handleRemoveFromCart = (index: number) => {
+    setCartItems(cartItems.filter((_, i) => i !== index));
+  };
+  // 총 금액 계산 함수
+  const calculateTotal = () => {
+    return cartItems.reduce((sum, item) => sum + item.price, 0);
+  };
+
+  const handlePayment = async () => {
+    try {
+      const response = await fetch("/api/main/order", {
+        method: "POST",
+        body: JSON.stringify({}),
+      });
+
+      if (!response.ok) {
+        throw new Error("주문에 실패했습니다.");
+      }
+
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="container-fluid p-4">
       <div className="flex justify-center mb-4">
         <h1 className="text-center">Grids & Circle</h1>
       </div>
-      
+
       <div className="max-w-[950px] w-[90%] mx-auto bg-white rounded-2xl shadow-lg">
         <div className="flex flex-col md:flex-row">
           {/* 상품 목록 섹션 */}
@@ -65,7 +125,6 @@ export default function Home() {
               <h5 className="font-bold">Cart Items</h5>
             </div>
             <hr className="my-4" />
-
             {/* Cart Items 섹션 */}
             <div className="space-y-2" id="cartItems">
               {cartItems.map((item, index) => (
@@ -76,12 +135,15 @@ export default function Home() {
                   </span>
                 </h6>
               ))}
+
             </div>
 
             {/* 주문 정보 입력 섹션 */}
             <form className="mt-4 space-y-4">
               <div>
-                <label htmlFor="email" className="block mb-1">이메일</label>
+                <label htmlFor="email" className="block mb-1">
+                  이메일
+                </label>
                 <input
                   type="email"
                   id="email"
@@ -89,7 +151,9 @@ export default function Home() {
                 />
               </div>
               <div>
-                <label htmlFor="address" className="block mb-1">주소</label>
+                <label htmlFor="address" className="block mb-1">
+                  주소
+                </label>
                 <input
                   type="text"
                   id="address"
@@ -97,7 +161,9 @@ export default function Home() {
                 />
               </div>
               <div>
-                <label htmlFor="postcode" className="block mb-1">우편번호</label>
+                <label htmlFor="postcode" className="block mb-1">
+                  우편번호
+                </label>
                 <input
                   type="text"
                   id="postcode"
@@ -113,8 +179,11 @@ export default function Home() {
               <h5 className="font-bold">총금액</h5>
               <h5 className="font-bold">{calculateTotal().toLocaleString()}원</h5>
             </div>
-            
-            <button className="w-full bg-gray-800 text-white py-2 rounded-md mt-4 hover:bg-gray-700">
+
+            <button
+              onClick={handlePayment}
+              className="w-full bg-gray-800 text-white py-2 rounded-md mt-4 hover:bg-gray-700"
+            >
               결제하기
             </button>
 
