@@ -1,12 +1,52 @@
+"use client";
 import Image from "next/image";
+import { useState } from "react";
+
+type Product = {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+  imgPath: string;
+};
+
+type ProductResponseDto = {
+  products: Product[];
+};
+
+type OrderRequestDto = {
+  email: string;
+  address: string;
+  postalCode: string;
+  totalPrice: number;
+  products: Product[];
+};
 
 export default function Home() {
+  const handlePayment = async () => {
+    try {
+      const response = await fetch("/api/main/order", {
+        method: "POST",
+        body: JSON.stringify({}),
+      });
+
+      if (!response.ok) {
+        throw new Error("주문에 실패했습니다.");
+      }
+
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className="container-fluid p-4">
       <div className="flex justify-center mb-4">
         <h1 className="text-center">Grids & Circle</h1>
       </div>
-      
+
       <div className="max-w-[950px] w-[90%] mx-auto bg-white rounded-2xl shadow-lg">
         <div className="flex flex-col md:flex-row">
           {/* 상품 목록 섹션 */}
@@ -14,7 +54,10 @@ export default function Home() {
             <h5 className="font-bold">상품 목록</h5>
             <ul className="w-full space-y-2 mt-3">
               {[1, 2, 3].map((item) => (
-                <li key={item} className="flex items-center gap-4 p-3 border rounded-lg">
+                <li
+                  key={item}
+                  className="flex items-center gap-4 p-3 border rounded-lg"
+                >
                   <div className="w-20">
                     <Image
                       src="https://i.imgur.com/HKOFQYa.jpeg"
@@ -45,25 +88,33 @@ export default function Home() {
               <h5 className="font-bold">Summary</h5>
             </div>
             <hr className="my-4" />
-            
+
             <div className="space-y-2">
               <h6 className="flex items-center">
-                Columbia Nariñó 
-                <span className="ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded">2개</span>
+                Columbia Nariñó
+                <span className="ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded">
+                  2개
+                </span>
               </h6>
               <h6 className="flex items-center">
                 Brazil Serra Do Caparaó
-                <span className="ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded">2개</span>
+                <span className="ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded">
+                  2개
+                </span>
               </h6>
               <h6 className="flex items-center">
                 Columbia Nariñó
-                <span className="ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded">2개</span>
+                <span className="ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded">
+                  2개
+                </span>
               </h6>
             </div>
 
             <form className="mt-4 space-y-4">
               <div>
-                <label htmlFor="email" className="block mb-1">이메일</label>
+                <label htmlFor="email" className="block mb-1">
+                  이메일
+                </label>
                 <input
                   type="email"
                   id="email"
@@ -71,7 +122,9 @@ export default function Home() {
                 />
               </div>
               <div>
-                <label htmlFor="address" className="block mb-1">주소</label>
+                <label htmlFor="address" className="block mb-1">
+                  주소
+                </label>
                 <input
                   type="text"
                   id="address"
@@ -79,7 +132,9 @@ export default function Home() {
                 />
               </div>
               <div>
-                <label htmlFor="postcode" className="block mb-1">우편번호</label>
+                <label htmlFor="postcode" className="block mb-1">
+                  우편번호
+                </label>
                 <input
                   type="text"
                   id="postcode"
@@ -95,8 +150,11 @@ export default function Home() {
               <h5>총금액</h5>
               <h5>15000원</h5>
             </div>
-            
-            <button className="w-full bg-gray-800 text-white py-2 rounded-md mt-4 hover:bg-gray-700">
+
+            <button
+              onClick={handlePayment}
+              className="w-full bg-gray-800 text-white py-2 rounded-md mt-4 hover:bg-gray-700"
+            >
               결제하기
             </button>
           </div>
