@@ -6,9 +6,20 @@
 ---
 
 
+
 ### 브랜치 전략 ###
 
 ---
+main : 언제든 실행 가능
+dev : 개발 중인 기능 통합
+
+* 새로운 브랜치 생성 예시
+```
+ex)
+feature/#이슈번호
+feature/#12
+```
+feature -> dev -> main
 
 ### 커밋 전략 ###
 
@@ -23,9 +34,10 @@
 | style | 코드 포맷팅    |
 | test | 테스트 코드 추가 |
 
-커밋 메시지에 이슈 추가
+* 커밋 메시지 작성 예시
 ```
-ex) git commit -m "#1 feat - 상품 CRUD 구현"
+git commit -m "#이슈번호 feat - 상품 CRUD 구현"
+git commit -m "#1 feat - 상품 CRUD 구현"
 ```
 
 
