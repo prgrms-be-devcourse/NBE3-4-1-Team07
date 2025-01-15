@@ -99,6 +99,7 @@ export default function Home() {
             <button className="w-full bg-gray-800 text-white py-2 rounded-md mt-4 hover:bg-gray-700">
               결제하기
             </button>
+
           </div>
         </div>
       </div>
