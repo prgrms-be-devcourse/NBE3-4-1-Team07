@@ -2,7 +2,7 @@ name: Scheduled Workflow
 
 on:
   schedule:
-    - cron: '59 23 * * *'
+    - cron: '0 23 * * *' # UTC 오후 11시 (한국 시간 오전 8시)
 
 jobs:
   daily_merge:
