@@ -30,9 +30,12 @@ feature -> dev -> main
 | feat | 기능 추가     |
 | docs | 문서 추가, 수정 |
 | fix  | 버그 수정     |
-| refactor | 코드 리팩토링   |
+| refactor | 코드 스타일 변경 (코드 포매팅, 세미콜론 누락 등) 기능 수정이 없는 경우  |
+| design | 	사용자 UI 디자인 변경 (CSS 등) |
 | style | 코드 포맷팅    |
 | test | 테스트 코드 추가 |
+| rename | 파일 혹은 폴더명을 수정만 한 경우 |
+| remove | 파일을 삭제만 한 경우 |
 
 * 커밋 메시지 작성 예시
 ```
