@@ -25,6 +25,7 @@ type OrderRequestDto = {
 
 export default function Home() {
   const [cartItems, setCartItems] = useState<Product[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
   // 상품 목록 데이터 (예시)
   const products: Product[] = [
     { 
@@ -61,14 +62,34 @@ export default function Home() {
     }
   ];
   const handleAddToCart = (product: Product) => {
-    setCartItems([...cartItems, product]);
+    setCartItems(prevItems => {
+      const existingItem = prevItems.find(item => item.id === product.id);
+      if (existingItem) {
+        return prevItems.map(item =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      }
+      return [...prevItems, { ...product, quantity: 1 }];
+    });
   };
-  const handleRemoveFromCart = (index: number) => {
-    setCartItems(cartItems.filter((_, i) => i !== index));
+  const handleRemoveFromCart = (productId: number) => {
+    setCartItems(prevItems => {
+      const existingItem = prevItems.find(item => item.id === productId);
+      if (existingItem && existingItem.quantity > 1) {
+        return prevItems.map(item =>
+          item.id === productId
+            ? { ...item, quantity: item.quantity - 1 }
+            : item
+        );
+      }
+      return prevItems.filter(item => item.id !== productId);
+    });
   };
   // 총 금액 계산 함수
   const calculateTotal = () => {
-    return cartItems.reduce((sum, item) => sum + item.price, 0);
+    return cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   };
 
   const handlePayment = async () => {
@@ -89,19 +110,35 @@ export default function Home() {
     }
   };
 
+  // 검색어에 따라 필터링된 상품 목록을 반환하는 함수
+  const filteredProducts = products.filter(product =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="container-fluid p-4">
+    <div className="min-h-screen bg-gray-100">
       <div className="flex justify-center mb-4">
-        <h1 className="text-center">Grids & Circle</h1>
+        <h1 className="text-3xl font-bold text-center py-4">Grids & Circle</h1>
       </div>
 
-      <div className="max-w-[950px] w-[90%] mx-auto bg-white rounded-2xl shadow-lg">
+      <div className="max-w-[px] w-[90%] mx-auto bg-white rounded-2xl shadow-lg">
         <div className="flex flex-col md:flex-row">
           {/* 상품 목록 섹션 */}
           <div className="md:w-2/3 mt-4 flex flex-col items-start p-3 pt-0">
-            <h5 className="font-bold">상품 목록</h5>
+            <div className="w-full flex justify-between items-center mb-4">
+              <h5 className="font-bold">상품 목록</h5>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="상품 검색..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800"
+                />
+              </div>
+            </div>
             <ul className="w-full space-y-2 mt-3">
-              {products.map((product) => (
+              {filteredProducts.map((product) => (
               <li key={product.id} className="flex justify-between items-center p-3 border rounded-lg hover:bg-gray-50">
                 <div>
                   <h6 className="font-semibold">{product.name}</h6>
@@ -127,22 +164,27 @@ export default function Home() {
             <hr className="my-4" />
             {/* Cart Items 섹션 */}
             <div className="space-y-2" id="cartItems">
-              {cartItems.map((item, index) => (
-                <h6 key={index} className="flex items-center">
-                  <span className="ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded"
-                  onClick={() => handleRemoveFromCart(index)}>
+              {cartItems.map((item) => (
+                <h6 key={item.id} className="flex items-center justify-between">
+                  <span 
+                    className="ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded cursor-pointer"
+                    onClick={() => handleRemoveFromCart(item.id)}
+                  >
                     {item.name} - {item.price.toLocaleString()}원
+                  </span>
+                  <span className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
+                    {item.quantity}개
                   </span>
                 </h6>
               ))}
-
             </div>
+            <hr className="my-8 border-2 border-gray-500" />
 
             {/* 주문 정보 입력 섹션 */}
             <form className="mt-4 space-y-4">
               <div>
                 <label htmlFor="email" className="block mb-1">
-                  이메일
+                  이메일 (예시: example@example.com)
                 </label>
                 <input
                   type="email"
@@ -152,7 +194,7 @@ export default function Home() {
               </div>
               <div>
                 <label htmlFor="address" className="block mb-1">
-                  주소
+                  주소 (예시: 서울시 서초구 반포대로 3)
                 </label>
                 <input
                   type="text"
@@ -162,7 +204,7 @@ export default function Home() {
               </div>
               <div>
                 <label htmlFor="postcode" className="block mb-1">
-                  우편번호
+                  우편번호 (예시: 06711)
                 </label>
                 <input
                   type="text"
