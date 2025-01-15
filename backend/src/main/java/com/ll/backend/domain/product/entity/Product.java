@@ -1,8 +1,8 @@
 package com.ll.backend.domain.product.entity;
 
-import com.ll.backend.domain.admin.entity.Admin;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -12,10 +12,11 @@ import java.time.LocalDateTime;
 @Setter
 public class Product {
     @Id
+    @Column(name = "product_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(unique = true, length = 20)
+    @Column(name = "product_name",unique = true, length = 20)
     private String name;
 
     private int price;
@@ -28,7 +29,9 @@ public class Product {
 
     private String imagePath;
 
-    @ManyToOne
-    private Admin admin;
+
+
+//    @ManyToOne
+//    private Admin admin;
 
 }
