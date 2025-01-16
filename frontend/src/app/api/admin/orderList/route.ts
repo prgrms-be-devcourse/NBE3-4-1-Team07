@@ -1,4 +1,4 @@
-import { Order, OrderRequestDto } from "@/app/types/Order";
+import { Order, OrderRequestDto, OrderResponseDto } from "@/app/types/Order";
 import { NextResponse } from "next/server";
 
 const orders: Order[] = [
@@ -58,7 +58,7 @@ const orders: Order[] = [
   },
 ];
 
-const data: OrderRequestDto = {
+const data: OrderResponseDto = {
   orders,
 };
 

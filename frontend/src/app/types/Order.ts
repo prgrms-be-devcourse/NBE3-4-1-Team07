@@ -1,3 +1,5 @@
+import { Product } from "./Product";
+
 export interface Order {
   id: number;
   email: string;
@@ -8,6 +10,14 @@ export interface Order {
   orderDate: string;
 }
 
-export interface OrderRequestDto {
+export interface OrderResponseDto {
   orders: Order[];
+}
+
+export interface OrderRequestDto {
+  email: string;
+  address: string;
+  postalCode: string;
+  totalPrice: number;
+  products: Product[];
 }
