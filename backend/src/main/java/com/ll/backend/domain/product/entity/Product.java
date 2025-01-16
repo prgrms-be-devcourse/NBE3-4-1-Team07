@@ -27,11 +27,22 @@ public class Product {
 
     private LocalDateTime modify_date;
 
-    private String imagePath;
-
-
+    private String imgPath;
 
 //    @ManyToOne
 //    private Admin admin;
 
+    public Product(String name, int price, int quantity, String imgPath) {
+        this.name = name;
+        this.price = price;
+        this.quantity = quantity;
+        this.modify_date = LocalDateTime.now();
+        this.created_date = LocalDateTime.now();
+        this.imgPath = imgPath;
+    }
+
+
+    public Product() {
+
+    }
 }
