@@ -30,8 +30,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Run Gradle tests
-        run: ./gradlew test
+      # 백엔드 테스트
+      - name: Run Backend Test
+        run: |
+          cd backend  
+          ./gradlew test
+
+      # 프론트 테스트
 
       - name: Publish test results
         if: failure()
