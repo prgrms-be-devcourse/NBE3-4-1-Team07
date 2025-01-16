@@ -2,7 +2,7 @@ name: Scheduled Workflow
 
 on:
   schedule:
-    - cron: '25 0 * * *' # UTC + 9
+    - cron: '35 3 * * *' # UTC + 9 = KTC
 
 jobs:
   daily_merge:
