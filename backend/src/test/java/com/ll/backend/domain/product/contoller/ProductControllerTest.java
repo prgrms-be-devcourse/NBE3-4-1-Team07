@@ -15,9 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -93,5 +93,60 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.price").value(lastProduct.getPrice()))
                 .andExpect(jsonPath("$.quantity").value(lastProduct.getQuantity()))
                 .andExpect(jsonPath("$.imgPath").value(lastProduct.getImgPath()));
+    }
+
+    @Test
+    @DisplayName("상품 수정")
+    void t3() throws Exception {
+        int productId = 1;
+        ResultActions resultActions = mvc
+                .perform(
+                        put("/admin/product/{id}", productId)
+                                .content("""
+                                        {
+                                             "name" : "우간다 커피",
+                                             "price" : 9000,
+                                             "quantity" : 2,
+                                             "imgPath" : ""
+                                        }
+                                        """)
+                                .contentType(
+                                        new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8)
+                                )
+                )
+                .andDo(print());
+
+        Product product;
+        Optional<Product> productOptional = productService.findById(productId);
+        if (productOptional.isPresent()) {
+            product = productOptional.get();
+        }else{
+            product = new Product();
+        }
+
+        resultActions
+                .andExpect(handler().handlerType(ProductController.class))
+                .andExpect(handler().methodName("updateProduct"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(product.getName()))
+                .andExpect(jsonPath("$.price").value(product.getPrice()))
+                .andExpect(jsonPath("$.quantity").value(product.getQuantity()))
+                .andExpect(jsonPath("$.imgPath").value(product.getImgPath()));
+    }
+
+    @Test
+    @DisplayName("상품 삭제")
+    void t4() throws Exception {
+        int productId = 1;
+        ResultActions resultActions = mvc
+                .perform(delete("/admin/product/{id}", productId)
+                        .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8)))
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ProductController.class))
+                .andExpect(handler().methodName("deleteProduct"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Product success deleted"));
     }
 }

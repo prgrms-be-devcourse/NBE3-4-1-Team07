@@ -3,7 +3,7 @@ package com.ll.backend.domain.product.dto;
 import lombok.Getter;
 
 @Getter
-public class ProductRequestDto {
+public class ProductReqDto {
     private String name;
     private int price;
     private int quantity;

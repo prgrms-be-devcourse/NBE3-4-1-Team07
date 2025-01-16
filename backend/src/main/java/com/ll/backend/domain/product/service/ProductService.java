@@ -1,12 +1,13 @@
 package com.ll.backend.domain.product.service;
 
-import com.ll.backend.domain.product.dto.ProductRequestDto;
+import com.ll.backend.domain.product.dto.ProductReqDto;
 import com.ll.backend.domain.product.entity.Product;
 import com.ll.backend.domain.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,12 +51,12 @@ public class ProductService {
     //SET @COUNT = 0;
     //UPDATE PRODUCT SET PRODUCT_ID = @COUNT:=@COUNT+1;
     //추후에 id 업데이트
-    public Product saveProduct(ProductRequestDto productRequestDto) {
+    public Product saveProduct(ProductReqDto productReqDto) {
         Product product = new Product(
-                productRequestDto.getName(),
-                productRequestDto.getPrice(),
-                productRequestDto.getQuantity(),
-                productRequestDto.getImgPath()
+                productReqDto.getName(),
+                productReqDto.getPrice(),
+                productReqDto.getQuantity(),
+                productReqDto.getImgPath()
         );
         return productRepository.save(product);
     }
@@ -66,5 +67,23 @@ public class ProductService {
             return product.get();
         }
         return null;
+    }
+
+    public Product modifyProduct(int id, ProductReqDto productReqDto) {
+        Optional<Product> productOptional = productRepository.findById(id);
+        if (productOptional.isPresent()) {
+            Product product = productOptional.get();
+            product.setName(productReqDto.getName());
+            product.setPrice(productReqDto.getPrice());
+            product.setQuantity(productReqDto.getQuantity());
+            product.setModify_date(LocalDateTime.now());
+            product.setImgPath(productReqDto.getImgPath());
+            return productRepository.save(product);
+        }
+        return null;
+    }
+
+    public void deleteProduct(int id) {
+        productRepository.deleteById(id);
     }
 }
