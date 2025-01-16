@@ -2,7 +2,7 @@ name: Scheduled Workflow
 
 on:
   schedule:
-    - cron: '0 23 * * *' # UTC 오후 11시 (한국 시간 오전 8시)
+    - cron: '25 0 * * *' # UTC + 9
 
 jobs:
   daily_merge:
@@ -22,11 +22,11 @@ jobs:
 
       - name: Get Current Date
         id: date
-        run: echo "BRANCH_NAME=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+        run: echo "BRANCH_NAME=$(date +'%Y-%m-%d')" >> $ENV
 
       - name: Create PR from dev to main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
         run: |
           # dev 브랜치 체크아웃 및 최신 상태로 업데이트
