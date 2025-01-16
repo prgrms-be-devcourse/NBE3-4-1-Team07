@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
+@Table(name="ORDERS")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,4 +32,16 @@ public class Order {
     private int totalPrice;
 
     private LocalDateTime orderDate;
+
+    public Order(String email, String address, String postalCode, String state, int totalPrice, LocalDateTime orderDate) {
+        this.email = email;
+        this.address = address;
+        this.postalCode = postalCode;
+        this.state = state;
+        this.totalPrice = totalPrice;
+        this.orderDate = orderDate;
+    }
+
+    public Order(){
+    }
 }

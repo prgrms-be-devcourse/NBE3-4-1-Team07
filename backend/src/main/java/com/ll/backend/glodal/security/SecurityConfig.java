@@ -18,6 +18,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/admin/login").permitAll()
+                        .requestMatchers("/admin/**").permitAll()
                         .requestMatchers("/admin/**").authenticated()
                         .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
                 .csrf((csrf) -> csrf.disable())
