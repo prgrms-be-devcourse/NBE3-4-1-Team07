@@ -1,6 +1,7 @@
 package com.ll.backend.domain.admin;
 
 import com.ll.backend.domain.admin.service.AdminService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,12 @@ public class AdminControllerTest {
     private MockMvc mvc;
     @Autowired
     private AdminService adminService;
+
+    @BeforeEach
+    void beforeEach() {
+        adminService.registerAdmin("user1", "1234");
+    }
+
 
     @Test
     @DisplayName("로그인")
