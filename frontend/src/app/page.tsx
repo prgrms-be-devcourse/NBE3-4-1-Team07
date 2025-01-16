@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Product } from "./types/Product";
+import Image from "next/image";
 
 const getProductList = async () => {
   const res = await fetch("/api/main/productList");
@@ -16,7 +17,6 @@ const getProductList = async () => {
 export default function Home() {
   const [cartItems, setCartItems] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
-
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
@@ -36,41 +36,6 @@ export default function Home() {
   const [sortOrder, setSortOrder] = useState<'high' | 'low'>('high');
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
-  // 상품 목록 데이터 (예시)
-  const products: Product[] = [
-    {
-      id: 1,
-      name: "스타벅스",
-      price: 12000,
-      description: "아메리카노",
-      quantity: 1,
-      imgPath: "/images/starbucks.jpg"
-    },
-    {
-      id: 2,
-      name: "이디야",
-      price: 8000,
-      description: "토피넛 라테",
-      quantity: 1,
-      imgPath: "/images/ediya.jpg"
-    },
-    {
-      id: 3,
-      name: "커피빈",
-      price: 6000,
-      description: "카푸치노",
-      quantity: 1,
-      imgPath: "/images/coffeebean.jpg"
-    },
-    {
-      id: 4,
-      name: "브루노",
-      price: 9000,
-      description: "브루노 마스",
-      quantity: 1,
-      imgPath: "/images/bruno.jpg"
-    }
-  ];
   const handleAddToCart = (product: Product) => {
     setCartItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === product.id);
