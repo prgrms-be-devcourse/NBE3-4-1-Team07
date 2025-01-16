@@ -1,71 +1,43 @@
 "use client";
-import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Product } from "./types/Product";
 
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  imgPath: string;
-  description: string;
-};
+const getProductList = async () => {
+  const res = await fetch("/api/main/productList");
 
-type ProductResponseDto = {
-  products: Product[];
-};
+  if (!res.ok) {
+    throw new Error("Failed to fetch product list");
+  }
 
-type OrderRequestDto = {
-  email: string;
-  address: string;
-  postalCode: string;
-  totalPrice: number;
-  products: Product[];
+  const data = await res.json();
+  return data;
 };
 
 export default function Home() {
   const [cartItems, setCartItems] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  // 상품 목록 데이터 (예시)
-  const products: Product[] = [
-    { 
-      id: 1, 
-      name: "스타벅스", 
-      price: 12000, 
-      description: "아메리카노",
-      quantity: 1,
-      imgPath: "/images/starbucks.jpg"
-    },
-    { 
-      id: 2, 
-      name: "이디야", 
-      price: 8000, 
-      description: "토피넛 라테",
-      quantity: 1,
-      imgPath: "/images/ediya.jpg"
-    },
-    { 
-      id: 3, 
-      name: "커피빈", 
-      price: 6000, 
-      description: "카푸치노",
-      quantity: 1,
-      imgPath: "/images/coffeebean.jpg"
-    },
-    { 
-      id: 4, 
-      name: "브루노", 
-      price: 9000, 
-      description: "브루노 마스",
-      quantity: 1,
-      imgPath: "/images/bruno.jpg"
-    }
-  ];
+
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    // 데이터 fetching
+    const fetchData = async () => {
+      try {
+        const data = await getProductList();
+        setProducts(data.products); // 데이터를 상태에 저장
+      } catch (err) {
+        console.log("상품 목록을 가져오는 데 문제가 발생했습니다.");
+      }
+    };
+
+    fetchData();
+  }, []); // 컴포넌트가 처음 렌더링될 때 한 번만 호출
+
   const handleAddToCart = (product: Product) => {
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === product.id);
+    setCartItems((prevItems) => {
+      const existingItem = prevItems.find((item) => item.id === product.id);
       if (existingItem) {
-        return prevItems.map(item =>
+        return prevItems.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
@@ -75,21 +47,21 @@ export default function Home() {
     });
   };
   const handleRemoveFromCart = (productId: number) => {
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === productId);
+    setCartItems((prevItems) => {
+      const existingItem = prevItems.find((item) => item.id === productId);
       if (existingItem && existingItem.quantity > 1) {
-        return prevItems.map(item =>
+        return prevItems.map((item) =>
           item.id === productId
             ? { ...item, quantity: item.quantity - 1 }
             : item
         );
       }
-      return prevItems.filter(item => item.id !== productId);
+      return prevItems.filter((item) => item.id !== productId);
     });
   };
   // 총 금액 계산 함수
   const calculateTotal = () => {
-    return cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    return cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   };
 
   const handlePayment = async () => {
@@ -111,7 +83,7 @@ export default function Home() {
   };
 
   // 검색어에 따라 필터링된 상품 목록을 반환하는 함수
-  const filteredProducts = products.filter(product =>
+  const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -139,20 +111,27 @@ export default function Home() {
             </div>
             <ul className="w-full space-y-2 mt-3">
               {filteredProducts.map((product) => (
-              <li key={product.id} className="flex justify-between items-center p-3 border rounded-lg hover:bg-gray-50">
-                <div>
-                  <h6 className="font-semibold">{product.name}</h6>
-                  <p className="text-sm text-gray-600">{product.description}</p>
-                  <p className="text-blue-600 font-medium">{product.price.toLocaleString()}원</p>
-                </div>
-                <button 
-                  onClick={() => handleAddToCart(product)}
-                  className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition"
+                <li
+                  key={product.id}
+                  className="flex justify-between items-center p-3 border rounded-lg hover:bg-gray-50"
                 >
-                  담기
-                </button>
-              </li>
-            ))}
+                  <div>
+                    <h6 className="font-semibold">{product.name}</h6>
+                    <p className="text-sm text-gray-600">
+                      {product.description}
+                    </p>
+                    <p className="text-blue-600 font-medium">
+                      {product.price.toLocaleString()}원
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleAddToCart(product)}
+                    className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition"
+                  >
+                    담기
+                  </button>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -166,7 +145,7 @@ export default function Home() {
             <div className="space-y-2" id="cartItems">
               {cartItems.map((item) => (
                 <h6 key={item.id} className="flex items-center justify-between">
-                  <span 
+                  <span
                     className="ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded cursor-pointer"
                     onClick={() => handleRemoveFromCart(item.id)}
                   >
@@ -219,7 +198,9 @@ export default function Home() {
 
             <div className="flex justify-between items-center border-t mt-4 pt-4">
               <h5 className="font-bold">총금액</h5>
-              <h5 className="font-bold">{calculateTotal().toLocaleString()}원</h5>
+              <h5 className="font-bold">
+                {calculateTotal().toLocaleString()}원
+              </h5>
             </div>
 
             <button
@@ -228,7 +209,6 @@ export default function Home() {
             >
               결제하기
             </button>
-
           </div>
         </div>
       </div>
