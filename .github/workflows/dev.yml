@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '23'
+          java-version: '17'
 
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
@@ -31,10 +31,11 @@ jobs:
             ${{ runner.os }}-gradle-
 
       # 백엔드 테스트
-      - name: Run Backend Test
+      - name: Run Backend tests
         run: |
-          cd backend  
-          ./gradlew test
+          cd backend           
+          chmod +x gradlew     
+          ./gradlew test       
 
       # 프론트 테스트
 
