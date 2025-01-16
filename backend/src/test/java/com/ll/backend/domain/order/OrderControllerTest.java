@@ -30,64 +30,86 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 public class OrderControllerTest {
-//    @Autowired
-//    private OrderService orderService;
-//    @Autowired
-//    private MockMvc mvc;
-//    @Autowired
-//    private AdminNotificationService adminNotificationService;
-//
-//    @Test
-//    @DisplayName("장바구니 상품 정보를 바탕으로 주문 생성")
-//    void t1() throws Exception{
-//        String requestBody = """
-//                {
-//                  "email": "test@example.com",
-//                  "address": "123 Test Street",
-//                  "postalCode": "12345",
-//                  "totalPrice": 100,
-//                  "products": [
-//                    {
-//                      "productId": 1,
-//                      "quantity": 2
-//                    },
-//                    {
-//                      "productId": 2,
-//                      "quantity": 1
-//                    }
-//                  ]
-//                }
-//                """;
-//
-//        ResultActions resultActions = mvc.perform(
-//                post("/api/main/order")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(requestBody)
-//                        .characterEncoding(StandardCharsets.UTF_8)
-//        ).andDo(print());
-//
-//        // 응답 상태 코드 확인
-//        resultActions
-//                .andExpect(status().isOk())
-//                .andExpect(content().string("Order successfully created."));
-//    }
-//
-//    @Test
-//    @DisplayName("결제 시 관리자에게 배송 요청")
-//    void t2() throws Exception{
-//        Long orderId = createSampleOrder();
-//
-//        ResultActions resultActions = mvc.perform(
-//                post("/api/main/payment/" + orderId)
-//        ).andDo(print());
-//
-//        // 응답 상태 코드 확인
-//        resultActions
-//                .andExpect(status().isOk())
-//                .andExpect(content().string("Payment processed and admin notified for shipping."));
-//    }
+    @Autowired
+    private OrderService orderService;
+    @Autowired
+    private MockMvc mvc;
+    @Autowired
+    private AdminNotificationService adminNotificationService;
 
-//    @Test
+    @Test
+    @DisplayName("장바구니 상품 정보를 바탕으로 주문 생성")
+    void t1() throws Exception{
+        String requestBody = """
+                {
+                  "email": "test@example.com",
+                  "address": "123 Test Street",
+                  "postalCode": "12345",
+                  "totalPrice": 100,
+                  "products": [
+                    {
+                      "productId": 1,
+                      "quantity": 2
+                    },
+                    {
+                      "productId": 2,
+                      "quantity": 1
+                    }
+                  ]
+                }
+                """;
+
+        ResultActions resultActions = mvc.perform(
+                post("/api/main/order")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
+                        .characterEncoding(StandardCharsets.UTF_8)
+        ).andDo(print());
+
+        // 응답 상태 코드 확인
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(content().string("Order successfully created."));
+    }
+
+    @Test
+    @DisplayName("결제 시 관리자에게 배송 요청")
+    void t2() throws Exception{
+        Long orderId = createSampleOrder();
+
+        ResultActions resultActions = mvc.perform(
+                post("/api/main/order/" + orderId)
+        ).andDo(print());
+
+        // 응답 상태 코드 확인
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(content().string("Payment processed and admin notified for shipping."));
+    }
+
+    //샘플 주문 생성
+    private Long createSampleOrder() {
+        OrderRequestDto orderRequest = new OrderRequestDto();
+        orderRequest.setEmail("test@example.com");
+        orderRequest.setAddress("123 Test Street");
+        orderRequest.setPostalCode("12345");
+        orderRequest.setTotalPrice(100);
+
+        OrderRequestDto.ProductOrderDto product1 = new OrderRequestDto.ProductOrderDto();
+        product1.setProductId(1);
+        product1.setQuantity(2);
+
+        OrderRequestDto.ProductOrderDto product2 = new OrderRequestDto.ProductOrderDto();
+        product2.setProductId(2);
+        product2.setQuantity(1);
+
+        orderRequest.setProducts(List.of(product1, product2));
+
+        Order order = orderService.createOrder(orderRequest);
+        return order.getId().longValue(); // 주문 ID 반환
+    }
+
+    //    @Test
 //    @DisplayName("주문 목록 조회")
 //    void t3() throws Exception{
 //
@@ -121,26 +143,5 @@ public class OrderControllerTest {
 //
 //    }
 
-    //샘플 주문 생성
-//    private Long createSampleOrder() {
-//        OrderRequestDto orderRequest = new OrderRequestDto();
-//        orderRequest.setEmail("test@example.com");
-//        orderRequest.setAddress("123 Test Street");
-//        orderRequest.setPostalCode("12345");
-//        orderRequest.setTotalPrice(100);
-//
-//        OrderRequestDto.ProductOrderDto product1 = new OrderRequestDto.ProductOrderDto();
-//        product1.setProductId(1L);
-//        product1.setQuantity(2);
-//
-//        OrderRequestDto.ProductOrderDto product2 = new OrderRequestDto.ProductOrderDto();
-//        product2.setProductId(2L);
-//        product2.setQuantity(1);
-//
-//        orderRequest.setProducts(List.of(product1, product2));
-//
-//        Order order = orderService.createOrder(orderRequest);
-//        return order.getOrderId();
-//    }
 
 }

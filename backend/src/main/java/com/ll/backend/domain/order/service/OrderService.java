@@ -25,7 +25,7 @@ public class OrderService {
 
     //주문생성
     @Transactional
-    public void createOrder(OrderRequestDto orderRequestDto) {
+    public Order createOrder(OrderRequestDto orderRequestDto) {
         // 주문 정보 생성
         Order order = new Order();
         order.setEmail(orderRequestDto.getEmail());
@@ -43,17 +43,12 @@ public class OrderService {
             Product product = productRepository.findById(productDto.getProductId())
                     .orElseThrow(() -> new IllegalArgumentException("Invalid product ID: " + productDto.getProductId()));
 
+
             // 유효성 검증: 주문 수량이 재고를 초과하지 않는지 확인
-            if (productDto.getQuantity() > product.getQuantity()) {
-                throw new IllegalArgumentException("Requested quantity exceeds available stock for product ID: " + productDto.getProductId());
-            }
+            validateProductStock(product, productDto);
 
             // 주문 상세 생성
-            OrderDetail orderDetail = new OrderDetail();
-            orderDetail.setOrder(savedOrder);
-            orderDetail.setProduct(product);
-            orderDetail.setQuantity(productDto.getQuantity());
-            orderDetail.setTotalPrice(productDto.getQuantity() * product.getPrice()); // 상세 금액 계산
+            OrderDetail orderDetail = createOrderDetail(savedOrder, product, productDto);
 
             // 재고 차감
             product.setQuantity(product.getQuantity() - productDto.getQuantity());
@@ -62,6 +57,23 @@ public class OrderService {
             // 주문 상세 저장
             orderDetailRepository.save(orderDetail);
         }
+        return savedOrder;
+    }
+
+    private void validateProductStock(Product product, OrderRequestDto.ProductOrderDto productDto) {
+        if (productDto.getQuantity() > product.getQuantity()) {
+            throw new IllegalArgumentException("Requested quantity exceeds available stock for product ID: " + productDto.getProductId()
+                    + ". Available stock: " + product.getQuantity());
+        }
+    }
+
+    private OrderDetail createOrderDetail(Order order, Product product, OrderRequestDto.ProductOrderDto productDto) {
+        OrderDetail orderDetail = new OrderDetail();
+        orderDetail.setOrder(order);
+        orderDetail.setProduct(product);
+        orderDetail.setQuantity(productDto.getQuantity());
+        orderDetail.setTotalPrice(productDto.getQuantity() * product.getPrice());
+        return orderDetail;
     }
 
 
