@@ -46,4 +46,8 @@ public class AdminService {
     public List<Admin> getAdmins(){
         return adminRepository.findAll();
     }
+
+    public Optional<Admin> findByUsername(String user1) {
+        return adminRepository.findByUsername(user1);
+    }
 }
