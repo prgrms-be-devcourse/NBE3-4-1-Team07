@@ -11,11 +11,11 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin")
 public class OrderController {
     private final OrderService orderService;
 
-    @GetMapping("/orderList")
+    //주문목록조회
+    @GetMapping("/admin/orderList")
     public List<Order> getOrderList(){
         return orderService.getAllOrders();
     }

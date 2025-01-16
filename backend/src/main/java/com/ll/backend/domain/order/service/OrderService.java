@@ -12,6 +12,7 @@ import java.util.List;
 public class OrderService {
     private final OrderRepository orderRepository;
 
+    //주문목록조회
     public List<Order> getAllOrders(){
         return orderRepository.findAll();
     }
