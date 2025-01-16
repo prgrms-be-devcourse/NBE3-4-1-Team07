@@ -1,8 +1,8 @@
-name: Scheduled Workflow
+name: Daily PR Workflow
 
 on:
   schedule:
-    - cron: '35 3 * * *' # UTC + 9 = KTC
+    - cron: '00 4 * * *' # UTC + 9 = KTC
 
 jobs:
   daily_merge:
@@ -22,7 +22,7 @@ jobs:
 
       - name: Get Current Date
         id: date
-        run: echo "BRANCH_NAME=$(date +'%Y-%m-%d')" >> $ENV
+        run: echo "BRANCH_NAME=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       - name: Create PR from dev to main
         env:
@@ -33,11 +33,11 @@ jobs:
           git checkout dev
           git pull origin dev
           
-          # 새 브랜치 생성
+          # 새 브랜치 생성 (dev에서 새 브랜치로)
           git checkout -b "$BRANCH_NAME"
-          git pull origin main
           
-          # dev와 main 병합 시도
+          # main 브랜치와 dev 병합 (main으로 PR을 생성할 준비)
+          git pull origin main
           git merge dev --no-ff || (echo "Merge conflict detected. Aborting." && exit 1)
 
           # 새 브랜치 푸시
