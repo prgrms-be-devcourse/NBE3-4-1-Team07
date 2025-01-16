@@ -1,69 +1,41 @@
 "use client";
+import { useEffect, useState } from "react";
+import { Product } from "./types/Product";
 import Image from "next/image";
-import { useState } from "react";
 
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  imgPath: string;
-  description: string;
-};
+const getProductList = async () => {
+  const res = await fetch("/api/main/productList");
 
-type ProductResponseDto = {
-  products: Product[];
-};
+  if (!res.ok) {
+    throw new Error("Failed to fetch product list");
+  }
 
-type OrderRequestDto = {
-  email: string;
-  address: string;
-  postalCode: string;
-  totalPrice: number;
-  products: Product[];
+  const data = await res.json();
+  return data;
 };
 
 export default function Home() {
   const [cartItems, setCartItems] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    // 데이터 fetching
+    const fetchData = async () => {
+      try {
+        const data = await getProductList();
+        setProducts(data.products); // 데이터를 상태에 저장
+      } catch (err) {
+        console.log("상품 목록을 가져오는 데 문제가 발생했습니다.");
+      }
+    };
+
+    fetchData();
+  }, []); // 컴포넌트가 처음 렌더링될 때 한 번만 호출
+
   const [sortOrder, setSortOrder] = useState<'high' | 'low'>('high');
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
-  // 상품 목록 데이터 (예시)
-  const products: Product[] = [
-    { 
-      id: 1, 
-      name: "스타벅스", 
-      price: 12000, 
-      description: "아메리카노",
-      quantity: 1,
-      imgPath: "/images/starbucks.jpg"
-    },
-    { 
-      id: 2, 
-      name: "이디야", 
-      price: 8000, 
-      description: "토피넛 라테",
-      quantity: 1,
-      imgPath: "/images/ediya.jpg"
-    },
-    { 
-      id: 3, 
-      name: "커피빈", 
-      price: 6000, 
-      description: "카푸치노",
-      quantity: 1,
-      imgPath: "/images/coffeebean.jpg"
-    },
-    { 
-      id: 4, 
-      name: "브루노", 
-      price: 9000, 
-      description: "브루노 마스",
-      quantity: 1,
-      imgPath: "/images/bruno.jpg"
-    }
-  ];
   const handleAddToCart = (product: Product) => {
     setCartItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === product.id);
@@ -131,7 +103,7 @@ export default function Home() {
   };
 
   const handleItemSelect = (itemId: number) => {
-    setSelectedItems(prev => 
+    setSelectedItems(prev =>
       prev.includes(itemId)
         ? prev.filter(id => id !== itemId)
         : [...prev, itemId]
@@ -194,7 +166,7 @@ export default function Home() {
                       <p className="text-blue-600 font-medium">{product.price.toLocaleString()}원</p>
                     </div>
                   </div>
-                  <button 
+                  <button
                     onClick={() => handleAddToCart(product)}
                     className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition"
                   >
@@ -219,6 +191,7 @@ export default function Home() {
               )}
             </div>
             <hr className="my-4" />
+            {/* Cart Items 섹션 */}
             <div className="space-y-2" id="cartItems">
               {cartItems.map((item) => (
                 <div key={item.id} className="flex items-center justify-between gap-2">
@@ -229,7 +202,7 @@ export default function Home() {
                       onChange={() => handleItemSelect(item.id)}
                       className="w-4 h-4 rounded border-gray-300 focus:ring-2 focus:ring-gray-800"
                     />
-                    <span 
+                    <span
                       className="px-2 py-1 bg-gray-800 text-white text-sm rounded cursor-pointer"
                       onClick={() => handleRemoveFromCart(item.id)}
                     >
