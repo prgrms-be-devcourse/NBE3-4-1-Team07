@@ -9,7 +9,7 @@ const products: Product[] = [
     price: 12000,
     description: "아메리카노",
     quantity: 1,
-    imgPath: "/images/starbucks.jpg"
+    imgPath: "/images/starbucks.jpg",
   },
   {
     id: 2,
@@ -17,7 +17,7 @@ const products: Product[] = [
     price: 8000,
     description: "토피넛 라테",
     quantity: 1,
-    imgPath: "/images/ediya.jpg"
+    imgPath: "/images/ediya.jpg",
   },
   {
     id: 3,
@@ -25,7 +25,7 @@ const products: Product[] = [
     price: 6000,
     description: "카푸치노",
     quantity: 1,
-    imgPath: "/images/coffeebean.jpg"
+    imgPath: "/images/coffeebean.jpg",
   },
   {
     id: 4,
@@ -33,8 +33,8 @@ const products: Product[] = [
     price: 9000,
     description: "브루노 마스",
     quantity: 1,
-    imgPath: "/images/bruno.jpg"
-  }
+    imgPath: "/images/bruno.jpg",
+  },
 ];
 
 const data: ProductReponseDto = {
