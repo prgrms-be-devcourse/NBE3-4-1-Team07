@@ -23,7 +23,7 @@ export default function admin() {
         const data = await getOrderList();
         setOrders(data.orders); // 데이터를 상태에 저장
       } catch (err) {
-        console.log("데이터를 가져오는 데 문제가 발생했습니다.");
+        console.log("주문 목록을 가져오는 데 문제가 발생했습니다.");
       }
     };
 
