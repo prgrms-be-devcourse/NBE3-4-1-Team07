@@ -26,6 +26,9 @@ type OrderRequestDto = {
 export default function Home() {
   const [cartItems, setCartItems] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<'high' | 'low'>('high');
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+
   // 상품 목록 데이터 (예시)
   const products: Product[] = [
     { 
@@ -73,6 +76,7 @@ export default function Home() {
       }
       return [...prevItems, { ...product, quantity: 1 }];
     });
+    setSelectedItems(prev => prev.filter(id => id !== product.id));
   };
   const handleRemoveFromCart = (productId: number) => {
     setCartItems(prevItems => {
@@ -84,6 +88,7 @@ export default function Home() {
             : item
         );
       }
+      setSelectedItems(prev => prev.filter(id => id !== productId));
       return prevItems.filter(item => item.id !== productId);
     });
   };
@@ -110,10 +115,33 @@ export default function Home() {
     }
   };
 
-  // 검색어에 따라 필터링된 상품 목록을 반환하는 함수
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // 정렬과 검색이 적용된 상품 목록을 반환하는 함수
+  const getFilteredAndSortedProducts = () => {
+    return products
+      .filter(product =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .sort((a, b) => {
+        if (sortOrder === 'high') {
+          return b.price - a.price; // 높은 가격순
+        } else {
+          return a.price - b.price; // 낮은 가격순
+        }
+      });
+  };
+
+  const handleItemSelect = (itemId: number) => {
+    setSelectedItems(prev => 
+      prev.includes(itemId)
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
+
+  const handleDeleteSelected = () => {
+    setCartItems(prev => prev.filter(item => !selectedItems.includes(item.id)));
+    setSelectedItems([]);
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -127,55 +155,91 @@ export default function Home() {
           <div className="md:w-2/3 mt-4 flex flex-col items-start p-3 pt-0">
             <div className="w-full flex justify-between items-center mb-4">
               <h5 className="font-bold">상품 목록</h5>
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="상품 검색..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800"
-                />
+              <div className="flex gap-4 items-center">
+                <select
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value as 'high' | 'low')}
+                  className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800"
+                >
+                  <option value="high">높은 가격순</option>
+                  <option value="low">낮은 가격순</option>
+                </select>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="상품 검색..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800"
+                  />
+                </div>
               </div>
             </div>
             <ul className="w-full space-y-2 mt-3">
-              {filteredProducts.map((product) => (
-              <li key={product.id} className="flex justify-between items-center p-3 border rounded-lg hover:bg-gray-50">
-                <div>
-                  <h6 className="font-semibold">{product.name}</h6>
-                  <p className="text-sm text-gray-600">{product.description}</p>
-                  <p className="text-blue-600 font-medium">{product.price.toLocaleString()}원</p>
-                </div>
-                <button 
-                  onClick={() => handleAddToCart(product)}
-                  className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition"
-                >
-                  담기
-                </button>
-              </li>
-            ))}
+              {getFilteredAndSortedProducts().map((product) => (
+                <li key={product.id} className="flex justify-between items-center p-3 border rounded-lg hover:bg-gray-50">
+                  <div className="flex items-center gap-4">
+                    <div className="w-20 h-20 relative">
+                      <Image
+                        src={product.imgPath}
+                        alt={product.name}
+                        fill
+                        className="object-cover rounded-lg"
+                        sizes="(max-width: 768px) 80px, 80px"
+                      />
+                    </div>
+                    <div>
+                      <h6 className="font-semibold">{product.name}</h6>
+                      <p className="text-sm text-gray-600">{product.description}</p>
+                      <p className="text-blue-600 font-medium">{product.price.toLocaleString()}원</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => handleAddToCart(product)}
+                    className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition"
+                  >
+                    담기
+                  </button>
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Summary 섹션 */}
           <div className="md:w-1/3 bg-gray-200 p-4 rounded-r-2xl">
-            <div>
+            <div className="flex justify-between items-center">
               <h5 className="font-bold">Cart Items</h5>
+              {selectedItems.length > 0 && (
+                <button
+                  onClick={handleDeleteSelected}
+                  className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition"
+                >
+                  선택 삭제
+                </button>
+              )}
             </div>
             <hr className="my-4" />
-            {/* Cart Items 섹션 */}
             <div className="space-y-2" id="cartItems">
               {cartItems.map((item) => (
-                <h6 key={item.id} className="flex items-center justify-between">
-                  <span 
-                    className="ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded cursor-pointer"
-                    onClick={() => handleRemoveFromCart(item.id)}
-                  >
-                    {item.name} - {item.price.toLocaleString()}원
-                  </span>
+                <div key={item.id} className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedItems.includes(item.id)}
+                      onChange={() => handleItemSelect(item.id)}
+                      className="w-4 h-4 rounded border-gray-300 focus:ring-2 focus:ring-gray-800"
+                    />
+                    <span 
+                      className="px-2 py-1 bg-gray-800 text-white text-sm rounded cursor-pointer"
+                      onClick={() => handleRemoveFromCart(item.id)}
+                    >
+                      {item.name} - {item.price.toLocaleString()}원
+                    </span>
+                  </div>
                   <span className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
                     {item.quantity}개
                   </span>
-                </h6>
+                </div>
               ))}
             </div>
             <hr className="my-8 border-2 border-gray-500" />
