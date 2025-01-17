@@ -6,9 +6,11 @@ import com.ll.backend.domain.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -23,9 +25,10 @@ public class ProductController {
         return new ResponseEntity<>(productList, HttpStatus.OK);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/admin/product/create")
-    public ResponseEntity<Product> createProduct(@RequestBody ProductReqDto productReqDto){
-        Product product = productService.saveProduct(productReqDto);
+    public ResponseEntity<Product> createProduct(@RequestBody ProductReqDto productReqDto, Principal principal){
+        Product product = productService.saveProduct(productReqDto, principal);
         if(product == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -33,6 +36,7 @@ public class ProductController {
         return ResponseEntity.created(location).body(product);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/admin/product/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable int id, @RequestBody ProductReqDto productReqDto){
         Product product = productService.modifyProduct(id, productReqDto);
@@ -42,6 +46,7 @@ public class ProductController {
         return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/admin/product/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable int id){
         productService.deleteProduct(id);
