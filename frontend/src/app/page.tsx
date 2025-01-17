@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Product } from "./types/Product";
 import Image from "next/image";
+import { OrderRequestDto } from './types/Order';
 
 const getProductList = async () => {
   const res = await fetch("/api/main/productList");
@@ -69,11 +70,37 @@ export default function Home() {
     return cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   };
 
+    // 사용자 입력을 위한 상태 추가
+  const [orderInfo, setOrderInfo] = useState({
+    email: '',
+    address: '',
+    postcode: ''
+  });
+
+  // 입력 핸들러 추가
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setOrderInfo(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+  // 결제버튼 클릭시 주문 처리
   const handlePayment = async () => {
     try {
+      const orderDate: OrderRequestDto = {
+        email: orderInfo.email,
+        address: orderInfo.address,
+        postalCode: orderInfo.postcode,
+        totalPrice: calculateTotal(),
+        products: cartItems.map(item => ({
+          id: item.id,
+          quantity: item.quantity
+        }))
+      };
       const response = await fetch("/api/main/order", {
         method: "POST",
-        body: JSON.stringify({}),
+        body: JSON.stringify(orderDate),
       });
 
       if (!response.ok) {
@@ -82,6 +109,10 @@ export default function Home() {
 
       const data = await response.json();
       console.log(data);
+
+          // 주문 성공 시 카트 비우기
+      setCartItems([]);
+      setOrderInfo({ email: '', address: '', postcode: '' });
     } catch (error) {
       console.error(error);
     }

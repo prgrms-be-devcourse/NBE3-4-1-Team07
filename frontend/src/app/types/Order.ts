@@ -19,5 +19,8 @@ export interface OrderRequestDto {
   address: string;
   postalCode: string;
   totalPrice: number;
-  products: Product[];
+  products: {
+    id: number;
+    quantity: number;
+  }[];
 }
