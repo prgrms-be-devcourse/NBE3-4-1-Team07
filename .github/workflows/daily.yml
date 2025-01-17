@@ -2,7 +2,7 @@ name: Daily PR Workflow
 
 on:
   schedule:
-    - cron: '20 4 * * *' # UTC + 9 = KTC
+    - cron: '30 5 * * *' #  + 9 = KTC
 
 jobs:
   daily_merge:
@@ -16,6 +16,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config pull.rebase false
 
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
