@@ -1,11 +1,25 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Order } from "../types/Order";
+import {Order, OrderResponseDto} from "../types/Order";
 import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
 import Image from "next/image";
-import {Product} from "@/app/types/Product";
+import {Product, ProductReponseDto} from "@/app/types/Product";
+import {Button, FormControl, Modal, Typography} from "@mui/material";
+import {Box} from "@mui/system";
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
 const getOrderList = async () => {
   const res = await fetch("/api/admin/orderList");
@@ -34,6 +48,8 @@ export default function admin() {
   const [activeMenu, setActiveMenu] = useState("orderList");
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProduts] = useState<Product[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     // 데이터 fetching
@@ -43,7 +59,7 @@ export default function admin() {
           const data: OrderResponseDto = await getOrderList();
           setOrders(data.orders); // 데이터를 상태에 저장
         } else if(activeMenu == "productList"){
-          const data: ProductResponseDto = await getProductList();
+          const data: ProductReponseDto = await getProductList();
           setProduts(data.products);
         }
       } catch (err) {
@@ -61,14 +77,44 @@ export default function admin() {
     dateTo: "",
   });
 
-  const handleMenuClick = (menu: string) => {
-    setActiveMenu(menu);
-  }
+  const handleMenuClick = (menu: string) => setActiveMenu(menu);
+
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters({ ...filters, [name]: value });
   };
+
+  const handleOpen = async (id: number) => {
+    try{
+      const response: Response = await fetch(`/api/admin/product/${id}`);
+
+      if(!response.ok){
+        throw new Error("상품 정보를 불러오는데 실패했습니다.");
+      }
+
+      const data: Product = await response.json();
+      console.log(data)
+
+      setSelectedProduct(data);
+      setIsModalOpen(true);
+      return data;
+    } catch(error){
+      console.error(error);
+      return null;
+    }
+  };
+
+  const handleClose = () => {
+    setIsModalOpen(false);
+    setSelectedProduct(null);
+  };
+
+  const handleAddProduct = () => {
+
+  }
+
+
 
   return (
       <div className="flex h-screen">
@@ -81,7 +127,6 @@ export default function admin() {
                 onClick={() => handleMenuClick("productList")}>등록상품조회</MenuItem>
           </Menu>
         </Sidebar>
-
         <div className="w-3/4 p-4 flex-grow overflow-auto">
           {activeMenu === "orderList" && (
             <div>
@@ -176,6 +221,7 @@ export default function admin() {
           {activeMenu === "productList" && (
               <div>
                 <h1 className="text-xl font-bold mb-4">상품 목록</h1>
+                <Button onClick={handleAddProduct}>추가</Button>
                 <ul className="w-full space-y-2 mt-3">
                   {products.map((product: Product) => (
                       <li key={product.id} className="flex justify-between items-center p-3 border rounded-lg hover:bg-gray-50">
@@ -197,6 +243,7 @@ export default function admin() {
                         </div>
                         <button
                             className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition"
+                            onClick={() => handleOpen(product.id)}
                         >
                           상세
                         </button>
@@ -204,6 +251,23 @@ export default function admin() {
                   ))}</ul>
               </div>)}
         </div>
+        <Modal
+            open={isModalOpen}
+            onClose={handleClose}
+            aria-labelledby="parent-modal-title"
+            aria-describedby="parent-modal-description"
+        >
+          <Box sx={style}>
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              모달 제목
+            </Typography>
+            <FormControl>
+              <input/>
+              <button>저장</button>
+              <button onClick={handleClose}>닫기</button>
+            </FormControl>
+          </Box>
+        </Modal>
       </div>
   );
 }
