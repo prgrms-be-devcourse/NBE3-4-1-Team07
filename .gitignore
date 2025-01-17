@@ -8,3 +8,4 @@ it ### Intellij+all template
 # Intellij
 .idea
 
+node_modules/
