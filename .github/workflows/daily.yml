@@ -2,7 +2,7 @@ name: Daily PR Workflow
 
 on:
   schedule:
-    - cron: '20 4 * * *' # UTC + 9 = KTC
+    - cron: '20 5 * * *' #  + 9 = KTC
 
 jobs:
   daily_merge:
