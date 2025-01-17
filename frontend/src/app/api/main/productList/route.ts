@@ -1,46 +1,39 @@
 import { NextResponse } from "next/server";
 import { Product, ProductReponseDto } from "@/app/types/Product";
 
-// 상품 목록 데이터 (예시)
-const products: Product[] = [
-  {
-    id: 1,
-    name: "스타벅스",
-    price: 12000,
-    description: "아메리카노",
-    quantity: 1,
-    imgPath: "/images/starbucks.jpg"
-  },
-  {
-    id: 2,
-    name: "이디야",
-    price: 8000,
-    description: "토피넛 라테",
-    quantity: 1,
-    imgPath: "/images/ediya.jpg"
-  },
-  {
-    id: 3,
-    name: "커피빈",
-    price: 6000,
-    description: "카푸치노",
-    quantity: 1,
-    imgPath: "/images/coffeebean.jpg"
-  },
-  {
-    id: 4,
-    name: "브루노",
-    price: 9000,
-    description: "브루노 마스",
-    quantity: 1,
-    imgPath: "/images/bruno.jpg"
-  },
-];
-
-const data: ProductReponseDto = {
-  products,
-};
+// api 에서 데이터를 가져옴
+async function fetchProducts(): Promise<Product[]> {
+  try {
+    const response = await fetch('http://localhost:8080/api/main/productList');
+    const rawData = await response.json();
+    
+    // API 응답을 Product 형식으로 변환
+    const products: Product[] = rawData.map((item: any) => ({
+      id: item.id, // API의 필드명에 따라 수정
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      imgPath: item.imgPath,
+      created_date: item.created_date,
+      modify_date: item.modify_date,
+      admin: {
+        id: item.admin.id,
+        username: item.admin.username,
+        password: item.admin.password
+      }
+    }));
+    
+    return products;
+  } catch (error) {
+    console.error('상품 데이터를 가져오는 중 오류 발생:', error);
+    return [];
+  }
+}
 
 export async function GET() {
+  const products = await fetchProducts();
+  const data: ProductReponseDto = {
+    products,
+  };
   return NextResponse.json(data);
 }
