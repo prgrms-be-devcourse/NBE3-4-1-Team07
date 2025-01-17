@@ -11,6 +11,8 @@ import lombok.Setter;
 @Setter
 public class OrderDetail {
 
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_detail_id")
@@ -25,5 +27,14 @@ public class OrderDetail {
     private Product product;
 
     private Integer quantity;
-    private Integer totalPrice;
+
+    public OrderDetail(Order order, Product product, Integer quantity) {
+        this.order = order;
+        this.product = product;
+        this.quantity = quantity;
+    }
+
+    public OrderDetail() {
+
+    }
 }
