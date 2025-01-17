@@ -6,7 +6,7 @@ import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
 import Image from "next/image";
 import {Product, ProductResponseDto} from "@/app/types/Product";
-import {Button, FormControl, Modal, TextField, Typography} from "@mui/material";
+import {Button, FormControl, Modal, TextField} from "@mui/material";
 import {Box} from "@mui/system";
 
 
@@ -104,10 +104,42 @@ export default function admin() {
 
   }
 
-  const handleSave = () => {
-    console.log('상품 정보 저장 완료 :', formValues);
+    const handleSave = async () => {
+        try {
+            if (formValues?.id === 0) {
+                // 새로운 상품 추가
+                const response = await fetch("/api/admin/product", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(formValues),
+                });
 
-  };
+                if (!response.ok) {
+                    throw new Error("상품 추가에 실패했습니다.");
+                }
+            } else {
+                // 기존 상품 수정
+                const response = await fetch(`/api/admin/product/${formValues?.id}`, {
+                    method: "PUT",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(formValues),
+                });
+
+                if (!response.ok) {
+                    throw new Error("상품 수정에 실패했습니다.");
+                }
+            }
+
+            // 상품 목록 갱신
+            const data: ProductResponseDto = await getProductList();
+            setProducts(data.products);
+
+            alert("저장되었습니다.");
+            handleClose();
+        } catch (error) {
+            console.error("상품 저장 오류 : " + error);
+        }
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;

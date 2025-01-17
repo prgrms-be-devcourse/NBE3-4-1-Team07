@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { Product, ProductReponseDto } from "@/app/types/Product";
+import { Product, ProductResponseDto } from "@/app/types/Product";
 
 // 상품 목록 데이터 (예시)
 let products: Product[] = [
@@ -37,7 +37,7 @@ let products: Product[] = [
   },
 ];
 
-const data: ProductReponseDto = {
+const data: ProductResponseDto = {
   products,
 };
 
@@ -47,6 +47,10 @@ export function getProducts(){
 
 export function addProduct(product: Product){
   products.push(product);
+}
+
+export function saveProducts(updatedProducts: Product[]) {
+  products = updatedProducts;
 }
 
 export async function GET() {
