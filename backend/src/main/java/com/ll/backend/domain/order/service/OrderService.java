@@ -2,10 +2,9 @@ package com.ll.backend.domain.order.service;
 
 import com.ll.backend.domain.order.OrderStatus;
 import com.ll.backend.domain.order.dto.OrderRequestDto;
+import com.ll.backend.domain.order.dto.ProductOrderDto;
 import com.ll.backend.domain.order.entity.Order;
 import com.ll.backend.domain.order.repository.OrderRepository;
-import com.ll.backend.domain.orderDetail.entity.OrderDetail;
-import com.ll.backend.domain.orderDetail.repository.OrderDetailRepository;
 import com.ll.backend.domain.product.entity.Product;
 import com.ll.backend.domain.product.repository.ProductRepository;
 import jakarta.transaction.Transactional;
@@ -15,13 +14,11 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final OrderDetailRepository orderDetailRepository;
     private final ProductRepository productRepository;
 
 
@@ -42,20 +39,6 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    public void createOrderDetails(Order order, List<OrderRequestDto.ProductOrderDto> products) {
-        for(int i = 0; i < products.size(); i++) {
-            Optional<Product> productOptional = productRepository.findById(products.get(i).getProductId());
-            if(productOptional.isPresent()) {
-                OrderDetail orderDetail = new OrderDetail(
-                        order,
-                        productOptional.get(),
-                        products.get(i).getQuantity()
-                );
-                orderDetailRepository.save(orderDetail);
-            }
-        }
-    }
-
     private OrderStatus setOrderStateBasedOnTime() {
         LocalDateTime now = LocalDateTime.now();
         LocalTime cutoffTime = LocalTime.of(14, 0); // 오후 2시 기준
@@ -65,6 +48,14 @@ public class OrderService {
         } else {
             return OrderStatus.PENDING;
         }
+    }
+
+    public long count() {
+        return orderRepository.count();
+    }
+
+    public Order initDataOrder(Order order) {
+        return orderRepository.save(order);
     }
 
     //결제 시 주문 상태 업데이트
@@ -124,7 +115,7 @@ public class OrderService {
 //    }
 
     // 유효성 검증
-    private void validateProductStock(Product product, OrderRequestDto.ProductOrderDto productDto) {
+    private void validateProductStock(Product product, ProductOrderDto productDto) {
         if (productDto.getQuantity() > product.getQuantity()) {
             throw new IllegalArgumentException("Requested quantity exceeds available stock for product ID: "
                     + productDto.getProductId() + ". Available stock: " + product.getQuantity());
@@ -132,9 +123,10 @@ public class OrderService {
     }
 
     // 주문 상품 정보를 가져오는 메서드
-    private List<OrderRequestDto.ProductOrderDto> convertToProductOrderDto(OrderRequestDto orderRequestDto) {
+    private List<ProductOrderDto> convertToProductOrderDto(OrderRequestDto orderRequestDto) {
         return orderRequestDto.getProducts();
     }
+
 
 
 }

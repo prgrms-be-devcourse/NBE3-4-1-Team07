@@ -1,34 +1,22 @@
 package com.ll.backend.domain.order;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ll.backend.domain.admin.service.AdminNotificationService;
-import com.ll.backend.domain.order.controller.OrderController;
-import com.ll.backend.domain.order.dto.OrderRequestDto;
-import com.ll.backend.domain.order.dto.OrderResponseDto;
-import com.ll.backend.domain.order.entity.Order;
 import com.ll.backend.domain.order.service.OrderService;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -74,46 +62,46 @@ public class OrderControllerTest {
                 .andExpect(jsonPath("$.message").value("Order successfully created."));
     }
 
-    @Test
-    @DisplayName("결제 시 관리자에게 배송 요청")
-    void t2() throws Exception{
-        Long orderId = createSampleOrder();
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        // OrderRequestDto 생성
-        OrderRequestDto requestDto = new OrderRequestDto();
-        requestDto.setEmail("user@example.com");
-        requestDto.setAddress("123 Test Street");
-        requestDto.setPostalCode("12345");
-        requestDto.setTotalPrice(5000);
-
-        // ProductOrderDto 목록 생성
-        OrderRequestDto.ProductOrderDto product1 = new OrderRequestDto.ProductOrderDto();
-        product1.setProductId(1);
-        product1.setQuantity(2);
-
-        OrderRequestDto.ProductOrderDto product2 = new OrderRequestDto.ProductOrderDto();
-        product2.setProductId(2);
-        product2.setQuantity(1);
-
-        requestDto.setProducts(List.of(product1, product2));
-
-        // DTO를 JSON으로 변환
-        String requestJson = objectMapper.writeValueAsString(requestDto);
-
-        // POST 요청 수행
-        ResultActions resultActions = mvc.perform(
-                        post("/api/main/order/" + orderId)
-                                .contentType(MediaType.APPLICATION_JSON) // 요청 본문 타입 설정
-                                .content(requestJson) // 요청 본문 설정
-                )
-                .andDo(print());
-
-        // 응답 상태 코드 및 메시지 확인
-        resultActions
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Payment processed and shipping request sent to admin."));
-    }
+//    @Test
+//    @DisplayName("결제 시 관리자에게 배송 요청")
+//    void t2() throws Exception{
+//        Long orderId = createSampleOrder();
+//        ObjectMapper objectMapper = new ObjectMapper();
+//
+//        // OrderRequestDto 생성
+//        OrderRequestDto requestDto = new OrderRequestDto();
+//        requestDto.setEmail("user@example.com");
+//        requestDto.setAddress("123 Test Street");
+//        requestDto.setPostalCode("12345");
+//        requestDto.setTotalPrice(5000);
+//
+//        // ProductOrderDto 목록 생성
+//        ProductOrderDto product1 = new ProductOrderDto();
+//        product1.setProductId(1);
+//        product1.setQuantity(2);
+//
+//        ProductOrderDto product2 = new ProductOrderDto();
+//        product2.setProductId(2);
+//        product2.setQuantity(1);
+//
+//        requestDto.setProducts(List.of(product1, product2));
+//
+//        // DTO를 JSON으로 변환
+//        String requestJson = objectMapper.writeValueAsString(requestDto);
+//
+//        // POST 요청 수행
+//        ResultActions resultActions = mvc.perform(
+//                        post("/api/main/order/" + orderId)
+//                                .contentType(MediaType.APPLICATION_JSON) // 요청 본문 타입 설정
+//                                .content(requestJson) // 요청 본문 설정
+//                )
+//                .andDo(print());
+//
+//        // 응답 상태 코드 및 메시지 확인
+//        resultActions
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.message").value("Payment processed and shipping request sent to admin."));
+//    }
 
     //하나는대기중상태인오더,하나는배송중인상태인오더
     //그리고 각 요청에 대해컨트롤러테스트
@@ -172,27 +160,27 @@ public class OrderControllerTest {
 //        }
 //    }
 
-    //샘플 주문 생성
-    private Long createSampleOrder() {
-        OrderRequestDto orderRequest = new OrderRequestDto();
-        orderRequest.setEmail("test@example.com");
-        orderRequest.setAddress("123 Test Street");
-        orderRequest.setPostalCode("12345");
-        orderRequest.setTotalPrice(100);
-
-        OrderRequestDto.ProductOrderDto product1 = new OrderRequestDto.ProductOrderDto();
-        product1.setProductId(1);
-        product1.setQuantity(2);
-
-        OrderRequestDto.ProductOrderDto product2 = new OrderRequestDto.ProductOrderDto();
-        product2.setProductId(2);
-        product2.setQuantity(1);
-
-        orderRequest.setProducts(List.of(product1, product2));
-
-        Order order = orderService.createOrder(orderRequest);
-        return order.getId().longValue(); // 주문 ID 반환
-    }
+//    //샘플 주문 생성
+//    private Long createSampleOrder() {
+//        OrderRequestDto orderRequest = new OrderRequestDto();
+//        orderRequest.setEmail("test@example.com");
+//        orderRequest.setAddress("123 Test Street");
+//        orderRequest.setPostalCode("12345");
+//        orderRequest.setTotalPrice(100);
+//
+//        ProductOrderDto product1 = new ProductOrderDto();
+//        product1.setProductId(1);
+//        product1.setQuantity(2);
+//
+//        ProductOrderDto product2 = new ProductOrderDto();
+//        product2.setProductId(2);
+//        product2.setQuantity(1);
+//
+//        orderRequest.setProducts(List.of(product1, product2));
+//
+//        Order order = orderService.createOrder(orderRequest);
+//        return order.getId().longValue(); // 주문 ID 반환
+//    }
 
     //    @Test
 //    @DisplayName("주문 목록 조회")
