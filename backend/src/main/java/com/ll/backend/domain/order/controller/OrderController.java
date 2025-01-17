@@ -21,7 +21,7 @@ public class OrderController {
     @PostMapping("/api/main/order")
     public ResponseEntity<OrderCreated> createOrder(@RequestBody OrderRequestDto orderRequestDto){
         Order order = orderService.createOrder(orderRequestDto);
-        return ResponseEntity.ok(new OrderCreated(order.getId(),"Order succesfully created."));
+        return ResponseEntity.ok(new OrderCreated(order.getId(),"Order successfully created."));
     }
 
     //결제완료

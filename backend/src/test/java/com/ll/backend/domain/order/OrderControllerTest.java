@@ -1,5 +1,6 @@
 package com.ll.backend.domain.order;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ll.backend.domain.admin.service.AdminNotificationService;
 import com.ll.backend.domain.order.controller.OrderController;
 import com.ll.backend.domain.order.dto.OrderRequestDto;
@@ -20,6 +21,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -69,40 +71,82 @@ public class OrderControllerTest {
         // 응답 상태 코드 확인
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(content().string("Order successfully created."));
+                .andExpect(jsonPath("$.message").value("Order successfully created."));
     }
 
     @Test
     @DisplayName("결제 시 관리자에게 배송 요청")
     void t2() throws Exception{
         Long orderId = createSampleOrder();
+        ObjectMapper objectMapper = new ObjectMapper();
 
+        // OrderRequestDto 생성
+        OrderRequestDto requestDto = new OrderRequestDto();
+        requestDto.setEmail("user@example.com");
+        requestDto.setAddress("123 Test Street");
+        requestDto.setPostalCode("12345");
+        requestDto.setTotalPrice(5000);
+
+        // ProductOrderDto 목록 생성
+        OrderRequestDto.ProductOrderDto product1 = new OrderRequestDto.ProductOrderDto();
+        product1.setProductId(1);
+        product1.setQuantity(2);
+
+        OrderRequestDto.ProductOrderDto product2 = new OrderRequestDto.ProductOrderDto();
+        product2.setProductId(2);
+        product2.setQuantity(1);
+
+        requestDto.setProducts(List.of(product1, product2));
+
+        // DTO를 JSON으로 변환
+        String requestJson = objectMapper.writeValueAsString(requestDto);
+
+        // POST 요청 수행
         ResultActions resultActions = mvc.perform(
-                post("/api/main/order/" + orderId)
-        ).andDo(print());
+                        post("/api/main/order/" + orderId)
+                                .contentType(MediaType.APPLICATION_JSON) // 요청 본문 타입 설정
+                                .content(requestJson) // 요청 본문 설정
+                )
+                .andDo(print());
 
-        // 응답 상태 코드 확인
+        // 응답 상태 코드 및 메시지 확인
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(content().string("Payment processed and admin notified for shipping."));
+                .andExpect(jsonPath("$.message").value("Payment processed and admin notified for shipping."));
     }
 
     @Test
     @DisplayName("주문 상태 업데이트")
     void t3() throws Exception {
         long orderId = createSampleOrder();
+        // 현재 시간을 가져옴
+        LocalTime currentTime = LocalTime.now();
 
-        // PENDING -> SHIPPED 상태 업데이트
-        ResultActions resultActions = mvc.perform(
-                MockMvcRequestBuilders.patch("/api/main/order/" + orderId + "/status")
-                        .param("newState", "SHIPPED")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-        ).andDo(print());
+        if (currentTime.isBefore(LocalTime.of(14, 0))) {
+            // 14시 이전 테스트: 상태가 PENDING -> SHIPPED로 변경
+            ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders.patch("/api/main/order/" + orderId + "/status")
+                            .param("newState", "SHIPPED")
+                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            ).andDo(print());
 
-        // 응답 상태 코드 확인
-        resultActions
-                .andExpect(status().isOk())
-                .andExpect(content().string("Order status updated to: SHIPPED"));
+            // 응답 상태 코드 확인
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(content().string("Order status updated to: SHIPPED"));
+        } else {
+            // 14시 이후 테스트: 상태가 PENDING으로 유지
+            ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders.patch("/api/main/order/" + orderId + "/status")
+                            .param("newState", "SHIPPED")
+                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            ).andDo(print());
+
+            // 응답 상태 코드 확인
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(content().string("Order status remains PENDING after 14:00"));
+        }
     }
 
     //샘플 주문 생성
