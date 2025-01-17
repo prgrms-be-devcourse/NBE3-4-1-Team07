@@ -112,7 +112,7 @@ public class OrderControllerTest {
         // 응답 상태 코드 및 메시지 확인
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Payment processed and admin notified for shipping."));
+                .andExpect(jsonPath("$.message").value("Payment processed and shipping request sent to admin."));
     }
 
     @Test

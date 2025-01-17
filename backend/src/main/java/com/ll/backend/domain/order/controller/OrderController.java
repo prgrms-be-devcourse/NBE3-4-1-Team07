@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,13 +28,17 @@ public class OrderController {
 
     //결제완료
     @PostMapping("/api/main/order/{orderId}")
-    public ResponseEntity<String> processPayment(@PathVariable int orderId, @RequestBody OrderRequestDto orderRequestDto) {
+    public ResponseEntity<Map<String, String>> processPayment(@PathVariable int orderId, @RequestBody OrderRequestDto orderRequestDto) {
         orderService.processPayment(orderId, orderRequestDto); // orderRequestDto 전달
         adminNotificationService.notifyAdminForShipping(orderId);
-        return ResponseEntity.ok("Payment processed and shipping request sent to admin.");
-    }
-    record PatchStatus(Order.OrderStatus newState){}
 
+        // JSON 형태의 응답 생성
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Payment processed and shipping request sent to admin.");
+        return ResponseEntity.ok(response);
+    }
+
+    record PatchStatus(Order.OrderStatus newState){}
     @PatchMapping("/api/main/order/{orderId}/status")
     public ResponseEntity<String> updateOrderStatus(
             @PathVariable int orderId,
