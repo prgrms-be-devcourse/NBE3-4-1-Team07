@@ -119,15 +119,21 @@ public class OrderControllerTest {
     @DisplayName("주문 상태 업데이트")
     void t3() throws Exception {
         long orderId = createSampleOrder();
-        // 현재 시간을 가져옴
         LocalTime currentTime = LocalTime.now();
+
+        // 요청 본문 JSON 생성
+        String requestBody = """
+            {
+              "newState": "SHIPPED"
+            }
+            """;
 
         if (currentTime.isBefore(LocalTime.of(14, 0))) {
             // 14시 이전 테스트: 상태가 PENDING -> SHIPPED로 변경
             ResultActions resultActions = mvc.perform(
                     MockMvcRequestBuilders.patch("/api/main/order/" + orderId + "/status")
-                            .param("newState", "SHIPPED")
-                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                            .content(requestBody)
+                            .contentType(MediaType.APPLICATION_JSON)
             ).andDo(print());
 
             // 응답 상태 코드 확인
@@ -138,8 +144,8 @@ public class OrderControllerTest {
             // 14시 이후 테스트: 상태가 PENDING으로 유지
             ResultActions resultActions = mvc.perform(
                     MockMvcRequestBuilders.patch("/api/main/order/" + orderId + "/status")
-                            .param("newState", "SHIPPED")
-                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                            .content(requestBody) // JSON 본문 전달
+                            .contentType(MediaType.APPLICATION_JSON) // JSON Content-Type 설정
             ).andDo(print());
 
             // 응답 상태 코드 확인
