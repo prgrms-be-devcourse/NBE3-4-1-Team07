@@ -1,5 +1,6 @@
 package com.ll.backend.glodal.initData;
 
+import com.ll.backend.domain.order.OrderStatus;
 import com.ll.backend.domain.order.entity.Order;
 import com.ll.backend.domain.order.repository.OrderRepository;
 import jakarta.transaction.Transactional;
@@ -9,8 +10,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-
-import java.time.LocalDateTime;
 
 @Configuration
 @RequiredArgsConstructor
@@ -38,25 +37,22 @@ public class OrderInitData {
                 "test@example.com",
                 "123 Street Name",
                 "12345",
-                "접수됨",
-                5000,
-                LocalDateTime.now()
+                OrderStatus.SHIPPED,
+                5000
         ));
         orderRepository.save(new Order(
                 "user@example.com",
                 "456 Another St",
                 "67890",
-                "배송 중",
-                7000,
-                LocalDateTime.now()
+                OrderStatus.SHIPPED,
+                7000
         ));
         orderRepository.save(new Order(
                 "customer@example.com",
                 "789 Last Lane",
                 "13579",
-                "완료",
-                10000,
-                LocalDateTime.now()
+                OrderStatus.SHIPPED,
+                10000
         ));
     }
 }

@@ -18,6 +18,6 @@ public class OrderRequestDto {
     @Setter
     public static class ProductOrderDto{
         private int productId;
-        private Integer quantity;
+        private int quantity;
     }
 }
