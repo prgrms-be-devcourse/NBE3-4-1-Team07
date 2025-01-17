@@ -41,7 +41,7 @@ const data: ProductReponseDto = {
   products,
 };
 
-export function getProduct(){
+export function getProducts(){
   return data.products;
 }
 

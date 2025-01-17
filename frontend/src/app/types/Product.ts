@@ -7,6 +7,7 @@ export interface Product {
   imgPath: string;
 }
 
-export interface ProductReponseDto {
+export interface ProductResponseDto {
   products: Product[];
 }
+
