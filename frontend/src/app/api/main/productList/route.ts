@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { Product, ProductReponseDto } from "@/app/types/Product";
 
 // 상품 목록 데이터 (예시)
-const products: Product[] = [
+let products: Product[] = [
   {
     id: 1,
     name: "스타벅스",
@@ -40,6 +40,14 @@ const products: Product[] = [
 const data: ProductReponseDto = {
   products,
 };
+
+export function getProduct(){
+  return data.products;
+}
+
+export function addProduct(product: Product){
+  products.push(product);
+}
 
 export async function GET() {
   return NextResponse.json(data);
