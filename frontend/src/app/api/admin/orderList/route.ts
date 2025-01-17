@@ -1,7 +1,7 @@
 import { Order, OrderRequestDto, OrderResponseDto } from "@/app/types/Order";
 import { NextResponse } from "next/server";
 
-const orders: Order[] = [
+let orders: Order[] = [
   {
     id: 1,
     address: "서울시 강남구 역삼동 123-45",
@@ -61,6 +61,14 @@ const orders: Order[] = [
 const data: OrderResponseDto = {
   orders,
 };
+
+export function getOrderList(){
+  return orders;
+}
+
+export function addOrder(order: Order){
+  orders.push(order)
+}
 
 //GET /api/admin/orderList
 

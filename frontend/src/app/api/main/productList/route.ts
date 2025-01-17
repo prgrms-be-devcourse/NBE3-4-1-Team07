@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { Product, ProductReponseDto } from "@/app/types/Product";
+import { Product, ProductResponseDto } from "@/app/types/Product";
 
 // api 에서 데이터를 가져옴
 async function fetchProducts(): Promise<Product[]> {
@@ -28,6 +28,18 @@ async function fetchProducts(): Promise<Product[]> {
     console.error('상품 데이터를 가져오는 중 오류 발생:', error);
     return [];
   }
+}
+
+export function getProducts(){
+  return data.products;
+}
+
+export function addProduct(product: Product){
+  products.push(product);
+}
+
+export function saveProducts(updatedProducts: Product[]) {
+  products = updatedProducts;
 }
 
 export async function GET() {
