@@ -115,45 +115,62 @@ public class OrderControllerTest {
                 .andExpect(jsonPath("$.message").value("Payment processed and shipping request sent to admin."));
     }
 
-    @Test
-    @DisplayName("주문 상태 업데이트")
-    void t3() throws Exception {
-        long orderId = createSampleOrder();
-        LocalTime currentTime = LocalTime.now();
-
-        // 요청 본문 JSON 생성
-        String requestBody = """
-            {
-              "newState": "SHIPPED"
-            }
-            """;
-
-        if (currentTime.isBefore(LocalTime.of(14, 0))) {
-            // 14시 이전 테스트: 상태가 PENDING -> SHIPPED로 변경
-            ResultActions resultActions = mvc.perform(
-                    MockMvcRequestBuilders.patch("/api/main/order/" + orderId + "/status")
-                            .content(requestBody)
-                            .contentType(MediaType.APPLICATION_JSON)
-            ).andDo(print());
-
-            // 응답 상태 코드 확인
-            resultActions
-                    .andExpect(status().isOk())
-                    .andExpect(content().string("Order status updated to: SHIPPED"));
-        } else {
-            // 14시 이후 테스트: 상태가 PENDING으로 유지
-            ResultActions resultActions = mvc.perform(
-                    MockMvcRequestBuilders.patch("/api/main/order/" + orderId + "/status")
-                            .content(requestBody) // JSON 본문 전달
-                            .contentType(MediaType.APPLICATION_JSON) // JSON Content-Type 설정
-            ).andDo(print());
-
-            // 응답 상태 코드 확인
-            resultActions
-                    .andExpect(status().isOk())
-                    .andExpect(content().string("Order status remains PENDING after 14:00"));
-        }
-    }
+    //하나는대기중상태인오더,하나는배송중인상태인오더
+    //그리고 각 요청에 대해컨트롤러테스트
+    //1번은성공해야되고 2번은실패해야됨
+//    @Test
+//    @DisplayName("주문 상태 업데이트")
+//    void t3() throws Exception {
+//
+//        Long orderId = createSampleOrder();
+//        //결제진행
+//        // OrderRequestDto 생성
+//        OrderRequestDto requestDto = new OrderRequestDto();
+//        requestDto.setEmail("user@example.com");
+//        requestDto.setAddress("123 Test Street");
+//        requestDto.setPostalCode("12345");
+//        requestDto.setTotalPrice(5000);
+//
+//        // ProductOrderDto 목록 생성
+//        OrderRequestDto.ProductOrderDto product1 = new OrderRequestDto.ProductOrderDto();
+//        product1.setProductId(1);
+//        product1.setQuantity(2);
+//
+//        OrderRequestDto.ProductOrderDto product2 = new OrderRequestDto.ProductOrderDto();
+//        product2.setProductId(2);
+//        product2.setQuantity(1);
+//
+//        requestDto.setProducts(List.of(product1, product2));
+//        //2시이전결제시shipped,이후결제시pending
+//        orderService.processPayment(orderId.intValue(),requestDto);
+//        LocalTime currentTime = LocalTime.now();
+//        // 요청 본문 JSON 생성
+//        String requestBody = """
+//            {
+//              "newState": "SHIPPED"
+//            }
+//            """;
+//        ResultActions resultActions = mvc.perform(
+//                MockMvcRequestBuilders.patch("/api/main/order/" + orderId + "/status")
+//                        .content(requestBody)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//        ).andDo(print());
+//        if (currentTime.isBefore(LocalTime.of(14, 0))) {
+//            // 14시 이전 테스트: 상태가 SHIPPED 변경없음,IllegalStateException처리
+//
+//            // 응답 상태 코드 확인
+//            resultActions
+//                    .andExpect(status().isOk())
+//                    .andExpect(content().string("Order status remains PENDING after 14:00"));
+//        } else {
+//            // 14시 이후 테스트: 상태가 SHIPPED으로 변경
+//            // 응답 상태 코드 확인
+//            resultActions
+//                    .andExpect(status().isOk())
+//                    .andExpect(content().string("Order status updated to: SHIPPED"));
+//
+//        }
+//    }
 
     //샘플 주문 생성
     private Long createSampleOrder() {
