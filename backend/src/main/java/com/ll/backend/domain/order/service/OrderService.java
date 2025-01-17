@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +24,7 @@ public class OrderService {
     private final OrderDetailRepository orderDetailRepository;
     private final ProductRepository productRepository;
 
-    //주문생성
+    // 주문 생성
     @Transactional
     public Order createOrder(OrderRequestDto orderRequestDto) {
         // 주문 정보 생성
@@ -36,45 +37,90 @@ public class OrderService {
         order.setState(Order.OrderStatus.PENDING);
 
         // 주문 저장
-        Order savedOrder = orderRepository.save(order);
+        return orderRepository.save(order);
+    }
 
-        // 주문 상세 저장
-        for (OrderRequestDto.ProductOrderDto productDto : orderRequestDto.getProducts()) {
+    //결제 시 주문 상태 업데이트
+    @Transactional
+    public void processPayment(int orderId, OrderRequestDto orderRequestDto) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found for ID: " + orderId));
+
+        // 14시 기준 상태 업데이트
+        setOrderStateBasedOnTime(order);
+
+        // 주문 상세 생성
+        createOrderDetails(order, orderRequestDto);
+
+        // 주문 저장
+        orderRepository.save(order);
+    }
+
+
+    @Transactional
+    public void updateOrderStatus(int orderId, Order.OrderStatus newState) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found for ID: " + orderId));
+
+        validateStateTransition(order.getState(), newState);
+
+        order.setState(newState);
+        orderRepository.save(order);
+    }
+
+    private void validateStateTransition(Order.OrderStatus currentState, Order.OrderStatus newState) {
+        // 상태 전환 규칙 검증
+        if ((currentState == Order.OrderStatus.PENDING && newState != Order.OrderStatus.SHIPPED) ||
+                (currentState == Order.OrderStatus.SHIPPED && newState != Order.OrderStatus.DELIVERED)) {
+            throw new IllegalStateException("Invalid state transition from " + currentState + " to " + newState);
+        }
+    }
+
+    private void setOrderStateBasedOnTime(Order order) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalTime cutoffTime = LocalTime.of(14, 0); // 오후 2시 기준
+
+        if (now.toLocalTime().isBefore(cutoffTime)) {
+            order.setState(Order.OrderStatus.SHIPPED);
+        } else {
+            order.setState(Order.OrderStatus.PENDING);
+        }
+    }
+
+    // 주문 상세 생성
+    private void createOrderDetails(Order order, OrderRequestDto orderRequestDto) {
+        for (OrderRequestDto.ProductOrderDto productDto : convertToProductOrderDto(orderRequestDto)) {
             Product product = productRepository.findById(productDto.getProductId())
                     .orElseThrow(() -> new IllegalArgumentException("Invalid product ID: " + productDto.getProductId()));
 
-
-            // 유효성 검증: 주문 수량이 재고를 초과하지 않는지 확인
             validateProductStock(product, productDto);
 
-            // 주문 상세 생성
-            OrderDetail orderDetail = createOrderDetail(savedOrder, product, productDto);
+            OrderDetail orderDetail = new OrderDetail();
+            orderDetail.setOrder(order);
+            orderDetail.setProduct(product);
+            orderDetail.setQuantity(productDto.getQuantity());
+            orderDetail.setTotalPrice(productDto.getQuantity() * product.getPrice());
 
-            // 재고 차감
             product.setQuantity(product.getQuantity() - productDto.getQuantity());
             productRepository.save(product);
-
-            // 주문 상세 저장
             orderDetailRepository.save(orderDetail);
         }
-        return savedOrder;
     }
 
+    // 유효성 검증
     private void validateProductStock(Product product, OrderRequestDto.ProductOrderDto productDto) {
         if (productDto.getQuantity() > product.getQuantity()) {
-            throw new IllegalArgumentException("Requested quantity exceeds available stock for product ID: " + productDto.getProductId()
-                    + ". Available stock: " + product.getQuantity());
+            throw new IllegalArgumentException("Requested quantity exceeds available stock for product ID: "
+                    + productDto.getProductId() + ". Available stock: " + product.getQuantity());
         }
     }
 
-    private OrderDetail createOrderDetail(Order order, Product product, OrderRequestDto.ProductOrderDto productDto) {
-        OrderDetail orderDetail = new OrderDetail();
-        orderDetail.setOrder(order);
-        orderDetail.setProduct(product);
-        orderDetail.setQuantity(productDto.getQuantity());
-        orderDetail.setTotalPrice(productDto.getQuantity() * product.getPrice());
-        return orderDetail;
+    // 주문 상품 정보를 가져오는 메서드
+    private List<OrderRequestDto.ProductOrderDto> convertToProductOrderDto(OrderRequestDto orderRequestDto) {
+        return orderRequestDto.getProducts();
     }
+}
+
 
 
 
@@ -92,4 +138,5 @@ public class OrderService {
 //                ))
 //                .collect(Collectors.toList());
 //    }
-}
+
+

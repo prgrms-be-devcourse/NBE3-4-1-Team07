@@ -1,5 +1,6 @@
 package com.ll.backend.domain.order.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.ll.backend.domain.orderDetail.entity.OrderDetail;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -8,6 +9,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Entity

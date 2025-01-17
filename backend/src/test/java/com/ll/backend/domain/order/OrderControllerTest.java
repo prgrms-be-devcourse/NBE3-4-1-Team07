@@ -12,9 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
@@ -34,8 +36,6 @@ public class OrderControllerTest {
     private OrderService orderService;
     @Autowired
     private MockMvc mvc;
-    @Autowired
-    private AdminNotificationService adminNotificationService;
 
     @Test
     @DisplayName("장바구니 상품 정보를 바탕으로 주문 생성")
@@ -85,6 +85,24 @@ public class OrderControllerTest {
         resultActions
                 .andExpect(status().isOk())
                 .andExpect(content().string("Payment processed and admin notified for shipping."));
+    }
+
+    @Test
+    @DisplayName("주문 상태 업데이트")
+    void t3() throws Exception {
+        long orderId = createSampleOrder();
+
+        // PENDING -> SHIPPED 상태 업데이트
+        ResultActions resultActions = mvc.perform(
+                MockMvcRequestBuilders.patch("/api/main/order/" + orderId + "/status")
+                        .param("newState", "SHIPPED")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        ).andDo(print());
+
+        // 응답 상태 코드 확인
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(content().string("Order status updated to: SHIPPED"));
     }
 
     //샘플 주문 생성
