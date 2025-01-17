@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -43,11 +42,15 @@ public class AdminService {
     }
 
     //관리자 조회
-    public List<Admin> getAdmins(){
-        return adminRepository.findAll();
+    public Optional<Admin> getAdmin(String username){
+        return adminRepository.findByUsername(username);
     }
 
     public Optional<Admin> findByUsername(String user1) {
         return adminRepository.findByUsername(user1);
+    }
+
+    public long count() {
+        return adminRepository.count();
     }
 }
