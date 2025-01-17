@@ -5,21 +5,10 @@ import {Order, OrderResponseDto} from "../types/Order";
 import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
 import Image from "next/image";
-import {Product, ProductReponseDto} from "@/app/types/Product";
-import {Button, FormControl, Modal, Typography} from "@mui/material";
+import {Product, ProductResponseDto} from "@/app/types/Product";
+import {Button, FormControl, Modal, TextField, Typography} from "@mui/material";
 import {Box} from "@mui/system";
 
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
 
 const getOrderList = async () => {
   const res = await fetch("/api/admin/orderList");
@@ -43,13 +32,14 @@ const getProductList = async () => {
   return data;
 };
 
+
 export default function admin() {
   // 주문 목록 조회가 디폴트
   const [activeMenu, setActiveMenu] = useState("orderList");
   const [orders, setOrders] = useState<Order[]>([]);
-  const [products, setProduts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [formValues, setFormValues] = useState<Product | null>(null);
 
   useEffect(() => {
     // 데이터 fetching
@@ -59,8 +49,8 @@ export default function admin() {
           const data: OrderResponseDto = await getOrderList();
           setOrders(data.orders); // 데이터를 상태에 저장
         } else if(activeMenu == "productList"){
-          const data: ProductReponseDto = await getProductList();
-          setProduts(data.products);
+          const data: ProductResponseDto = await getProductList();
+          setProducts(data.products);
         }
       } catch (err) {
         console.log("데이터를 가져오는 데 문제가 발생했습니다.");
@@ -94,9 +84,9 @@ export default function admin() {
       }
 
       const data: Product = await response.json();
-      console.log(data)
+      console.log("모달 오픈 : " + data);
 
-      setSelectedProduct(data);
+      setFormValues(data);
       setIsModalOpen(true);
       return data;
     } catch(error){
@@ -107,14 +97,25 @@ export default function admin() {
 
   const handleClose = () => {
     setIsModalOpen(false);
-    setSelectedProduct(null);
+    setFormValues(null);
   };
 
   const handleAddProduct = () => {
 
   }
 
+  const handleSave = () => {
+    console.log('상품 정보 저장 완료 :', formValues);
 
+  };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormValues((prev) => ({
+            ...prev!,
+            [name]: name === 'price' || name === 'quantity' ? parseInt(value) : value,
+        }));
+    };
 
   return (
       <div className="flex h-screen">
@@ -254,18 +255,91 @@ export default function admin() {
         <Modal
             open={isModalOpen}
             onClose={handleClose}
-            aria-labelledby="parent-modal-title"
-            aria-describedby="parent-modal-description"
+            aria-labelledby="product-modal-title"
+            aria-describedby="product-modal-description"
         >
-          <Box sx={style}>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              모달 제목
-            </Typography>
-            <FormControl>
-              <input/>
-              <button>저장</button>
-              <button onClick={handleClose}>닫기</button>
-            </FormControl>
+          <Box
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: 600,
+                backgroundColor: 'white',
+                border: '2px solid #000',
+                boxShadow: '24px',
+                padding: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+              }}
+          >
+              <Box style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
+                  <Box
+                      style={{
+                          width: "150px",
+                          height: "150px",
+                          position: "relative",
+                          border: "1px solid #ddd",
+                          borderRadius: "8px",
+                          overflow: "hidden",
+                      }}
+                  >
+                      {formValues?.imgPath && (
+                          <Image
+                              src={formValues.imgPath}
+                              alt={formValues.name}
+                              layout="fill"
+                              objectFit="cover"
+                          />
+                      )}
+                  </Box>
+                  <Box style={{ flex: 1 }}>
+                      <FormControl fullWidth>
+                          <TextField
+                              label="상품명"
+                              name="name"
+                              value={formValues?.name || ""}
+                              onChange={handleInputChange}
+                              margin="normal"
+                          />
+                          <TextField
+                              label="가격"
+                              name="price"
+                              type="number"
+                              value={formValues?.price || ""}
+                              onChange={handleInputChange}
+                              margin="normal"
+                          />
+                          <TextField
+                              label="설명"
+                              name="description"
+                              value={formValues?.description || ""}
+                              onChange={handleInputChange}
+                              margin="normal"
+                              multiline
+                              rows={3}
+                          />
+                          <TextField
+                              label="수량"
+                              name="quantity"
+                              type="number"
+                              value={formValues?.quantity || ""}
+                              onChange={handleInputChange}
+                              margin="normal"
+                          />
+                      </FormControl>
+                  </Box>
+              </Box>
+            {/* Bottom: Buttons */}
+            <Box style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+              <Button variant="contained" color="primary" onClick={handleSave}>
+                저장
+              </Button>
+              <Button variant="outlined" onClick={handleClose}>
+                닫기
+              </Button>
+            </Box>
           </Box>
         </Modal>
       </div>
