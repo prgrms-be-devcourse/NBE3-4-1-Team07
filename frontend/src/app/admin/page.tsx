@@ -1,84 +1,41 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Order } from "../types/Order";
 
-type Order = {
-  id: number;
-  email: string;
-  address: string;
-  postalCode: string;
-  state: string;
-  totalPrice: number;
-  orderDate: string;
+const getOrderList = async () => {
+  const res = await fetch("/api/admin/orderList");
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch order list");
+  }
+
+  const data = await res.json();
+  return data;
 };
 
-type OrderRequestDto = {
-  orders: Order[];
-};
+export default function admin() {
+  const [orders, setOrders] = useState<Order[]>([]);
 
-export default function admi() {
+  useEffect(() => {
+    // 데이터 fetching
+    const fetchData = async () => {
+      try {
+        const data = await getOrderList();
+        setOrders(data.orders); // 데이터를 상태에 저장
+      } catch (err) {
+        console.log("주문 목록을 가져오는 데 문제가 발생했습니다.");
+      }
+    };
+
+    fetchData();
+  }, []); // 컴포넌트가 처음 렌더링될 때 한 번만 호출
+
   const [filters, setFilters] = useState({
     searchType: "",
     keyword: "",
     dateFrom: "",
     dateTo: "",
   });
-
-  const orders = [
-    {
-      id: 1,
-      address: "서울시 강남구 역삼동 123-45",
-      email: "test1@test.com",
-      postalCode: "00000",
-      state: "주문접수",
-      totalPrice: 100000,
-      orderDate: "2025-01-15 12:00:00",
-    },
-    {
-      id: 2,
-      address: "서울시 강남구 역삼동 123-45",
-      email: "test2@test.com",
-      postalCode: "00000",
-      state: "주문접수",
-      totalPrice: 100000,
-      orderDate: "2025-01-15 12:00:00",
-    },
-    {
-      id: 3,
-      address: "강원도 원주시 효동로 123-45",
-      email: "test3@test.com",
-      postalCode: "00000",
-      state: "주문접수",
-      totalPrice: 100000,
-      orderDate: "2025-01-15 12:00:00",
-    },
-    {
-      id: 4,
-      address: "충청남도 천안시 동남구 목천읍 중앙로 123-45",
-      email: "test4@test.com",
-      postalCode: "00000",
-      state: "주문접수",
-      totalPrice: 100000,
-      orderDate: "2025-01-15 12:00:00",
-    },
-    {
-      id: 5,
-      address: "경기도 안산시 단대로 123-45",
-      email: "test5@test.com",
-      postalCode: "00000",
-      state: "주문접수",
-      totalPrice: 100000,
-      orderDate: "2025-01-15 12:00:00",
-    },
-    {
-      id: 6,
-      address: "경상남도 합천군 합천읍 합천로 123-45",
-      email: "test6@test.com",
-      postalCode: "00000",
-      state: "주문접수",
-      totalPrice: 100000,
-      orderDate: "2025-01-15 12:00:00",
-    },
-  ];
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
