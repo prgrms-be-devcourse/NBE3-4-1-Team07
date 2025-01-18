@@ -2,8 +2,11 @@ package com.ll.backend.domain.order;
 
 import com.ll.backend.domain.order.controller.OrderController;
 import com.ll.backend.domain.order.dto.OrderResponseDto;
+import com.ll.backend.domain.order.entity.Order;
+import com.ll.backend.domain.order.repository.OrderRepository;
 import com.ll.backend.domain.order.service.OrderService;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,7 +106,7 @@ public class OrderControllerTest {
     void t3() throws Exception {
         String requestBody = """
         {
-            "id": [59, 60]
+            "id": [62, 63]
         }
         """;
 
@@ -114,8 +117,16 @@ public class OrderControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Delivery status updated successfully."))
                 .andDo(print());
+
+        // 검증
+        List<Order> updatedOrders = orderRepository.findAll();
+        for (Order order : updatedOrders) {
+            Assertions.assertEquals(OrderStatus.SHIPPED, order.getState());
+        }
     }
 
+    @Autowired
+    private OrderRepository orderRepository;
 
 
 //    @Test

@@ -83,22 +83,17 @@ public class OrderService {
     public void updateDeliveryStatus(OrderDeliveryRequestDto orderDeliveryRequestDto){
         List<Integer> orderIds = orderDeliveryRequestDto.getId();
 
+        if (orderIds == null || orderIds.isEmpty()) {
+            throw new IllegalArgumentException("ID list cannot be null or empty.");
+        }
+
         for (Integer orderId : orderIds) {
             Order order = orderRepository.findById(orderId)
                     .orElseThrow(() -> new IllegalArgumentException("Order not found for ID: " + orderId));
 
-            // 배송 상태 변경 로직
-            if (isAfter2PM()) {
-                order.setState(OrderStatus.DELIVERED); // 배송 상태로 변경
-            } else {
-                throw new IllegalArgumentException("Orders can only be processed after 2 PM.");
-            }
+            // 배송 상태를 SHIPPED로 변경
+            order.setState(OrderStatus.SHIPPED);
         }
-    }
-
-    private boolean isAfter2PM() {
-        LocalTime now = LocalTime.now();
-        return now.isAfter(LocalTime.of(14, 0));
     }
 }
 
