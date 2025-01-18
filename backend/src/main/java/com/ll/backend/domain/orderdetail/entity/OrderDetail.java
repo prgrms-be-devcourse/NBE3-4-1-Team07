@@ -1,4 +1,4 @@
-package com.ll.backend.domain.orderDetail.entity;
+package com.ll.backend.domain.orderdetail.entity;
 
 import com.ll.backend.domain.order.entity.Order;
 import com.ll.backend.domain.product.entity.Product;

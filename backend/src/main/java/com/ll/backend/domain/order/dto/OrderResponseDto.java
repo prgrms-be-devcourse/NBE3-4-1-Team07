@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -16,5 +15,4 @@ public class OrderResponseDto {
     private String state;
     private Integer totalPrice;
     private LocalDateTime orderDate;
-    private List<OrderDetailResponseDto> products;
 }

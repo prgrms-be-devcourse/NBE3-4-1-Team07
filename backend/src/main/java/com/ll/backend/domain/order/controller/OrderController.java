@@ -3,7 +3,7 @@ package com.ll.backend.domain.order.controller;
 import com.ll.backend.domain.order.dto.OrderRequestDto;
 import com.ll.backend.domain.order.entity.Order;
 import com.ll.backend.domain.order.service.OrderService;
-import com.ll.backend.domain.orderDetail.service.OrderDetailService;
+import com.ll.backend.domain.orderdetail.service.OrderDetailService;
 import com.ll.backend.domain.order.dto.OrderResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +33,7 @@ public class OrderController {
 
     @GetMapping("/admin/orderList")
     public ResponseEntity<List<OrderResponseDto>> getOrderList() {
-        List<OrderResponseDto> orderList = orderService.getOrderListWithDetails();
+        List<OrderResponseDto> orderList = orderService.getOrderList();
         if (orderList.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

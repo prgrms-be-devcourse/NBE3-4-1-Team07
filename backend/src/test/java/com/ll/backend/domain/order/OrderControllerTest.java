@@ -1,7 +1,6 @@
 package com.ll.backend.domain.order;
 
 import com.ll.backend.domain.order.controller.OrderController;
-import com.ll.backend.domain.order.dto.OrderDetailResponseDto;
 import com.ll.backend.domain.order.dto.OrderResponseDto;
 import com.ll.backend.domain.order.service.OrderService;
 import org.hamcrest.Matchers;
@@ -78,7 +77,7 @@ public class OrderControllerTest {
         ).andDo(print());
 
 
-        List<OrderResponseDto> orderListWithDetails = orderService.getOrderListWithDetails();
+        List<OrderResponseDto> orderListWithDetails = orderService.getOrderList();
 
         for (int i = 0; i < orderListWithDetails.size(); i++) {
             OrderResponseDto orderDto = orderListWithDetails.get(i);
@@ -92,23 +91,12 @@ public class OrderControllerTest {
                     .andExpect(jsonPath("$[" + i + "].postalCode").value(orderDto.getPostalCode()))
                     .andExpect(jsonPath("$[" + i + "].state").value(orderDto.getState()))
                     .andExpect(jsonPath("$[" + i + "].totalPrice").value(orderDto.getTotalPrice()))
-                    .andExpect(jsonPath("$[" + i + "].orderDate").value(Matchers.startsWith(orderDto.getOrderDate().toString().substring(0, 19))))
-                    .andExpect(jsonPath("$[" + i + "].products").isArray());
-
-            // products 배열의 각 요소 검증
-            for (int j = 0; j < orderDto.getProducts().size(); j++) {
-                OrderDetailResponseDto detailDto = orderDto.getProducts().get(j);
-                resultActions
-                        .andExpect(jsonPath("$[" + i + "].products[" + j + "].order_detail_id").value(detailDto.getOrder_detail_id()))
-                        .andExpect(jsonPath("$[" + i + "].products[" + j + "].order_id").value(detailDto.getOrder_id()))
-                        .andExpect(jsonPath("$[" + i + "].products[" + j + "].productSummaryDto.name").value(detailDto.getProductSummaryDto().getName()))
-                        .andExpect(jsonPath("$[" + i + "].products[" + j + "].productSummaryDto.price").value(detailDto.getProductSummaryDto().getPrice()))
-                        .andExpect(jsonPath("$[" + i + "].products[" + j + "].productSummaryDto.imgPath").value(detailDto.getProductSummaryDto().getImgPath()))
-                        .andExpect(jsonPath("$[" + i + "].products[" + j + "].quantity").value(detailDto.getQuantity()));
-            }
+                    .andExpect(jsonPath("$[" + i + "].orderDate").value(Matchers.startsWith(orderDto.getOrderDate().toString().substring(0, 19))));
         }
         // 응답 상태 코드 확인
     }
+
+
 
 //    @Test
 //    @DisplayName("결제 시 관리자에게 배송 요청")
