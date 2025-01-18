@@ -1,6 +1,7 @@
 package com.ll.backend.domain.order.service;
 
 import com.ll.backend.domain.order.OrderStatus;
+import com.ll.backend.domain.order.dto.OrderDeliveryRequestDto;
 import com.ll.backend.domain.order.dto.OrderRequestDto;
 import com.ll.backend.domain.order.dto.OrderResponseDto;
 import com.ll.backend.domain.order.entity.Order;
@@ -75,6 +76,24 @@ public class OrderService {
                         order.getOrderDate()
                 ))
                 .collect(Collectors.toList());
+    }
+
+    //배송 상태 변경
+    @Transactional
+    public void updateDeliveryStatus(OrderDeliveryRequestDto orderDeliveryRequestDto){
+        List<Integer> orderIds = orderDeliveryRequestDto.getId();
+
+        if (orderIds == null || orderIds.isEmpty()) {
+            throw new IllegalArgumentException("ID list cannot be null or empty.");
+        }
+
+        for (Integer orderId : orderIds) {
+            Order order = orderRepository.findById(orderId)
+                    .orElseThrow(() -> new IllegalArgumentException("Order not found for ID: " + orderId));
+
+            // 배송 상태를 SHIPPED로 변경
+            order.setState(OrderStatus.SHIPPED);
+        }
     }
 }
 
