@@ -1,5 +1,6 @@
 package com.ll.backend.domain.order.dto;
 
+import com.ll.backend.domain.orderdetail.dto.OrderDetailRequestDto;
 import lombok.Getter;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 package com.ll.backend.domain.order.entity;
 
 import com.ll.backend.domain.order.OrderStatus;
-import com.ll.backend.domain.orderDetail.entity.OrderDetail;
+import com.ll.backend.domain.orderdetail.entity.OrderDetail;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.Getter;

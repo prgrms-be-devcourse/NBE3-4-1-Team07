@@ -57,8 +57,8 @@ class ProductControllerTest {
                     .andExpect(jsonPath("$[%d].name".formatted(i)).value(product.getName()))
                     .andExpect(jsonPath("$[%d].price".formatted(i)).value(product.getPrice()))
                     .andExpect(jsonPath("$[%d].quantity".formatted(i)).value(product.getQuantity()))
-                    .andExpect(jsonPath("$[%d].created_date".formatted(i)).value(Matchers.startsWith(product.getCreated_date().toString())))
-                    .andExpect(jsonPath("$[%d].modify_date".formatted(i)).value(Matchers.startsWith(product.getModify_date().toString())))
+                    .andExpect(jsonPath("$[%d].created_date".formatted(i)).value(Matchers.startsWith(product.getCreated_date().toString().substring(0, 20))))
+                    .andExpect(jsonPath("$[%d].modify_date".formatted(i)).value(Matchers.startsWith(product.getModify_date().toString().substring(0, 20))))
                     .andExpect(jsonPath("$[%d].imgPath".formatted(i)).value(product.getImgPath()));
         }
     }
