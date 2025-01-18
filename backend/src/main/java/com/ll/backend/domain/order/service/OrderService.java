@@ -10,11 +10,11 @@ import com.ll.backend.domain.product.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +22,6 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final OrderDetailService orderDetailService;
-
 
     // 주문 생성
     @Transactional
@@ -34,9 +33,7 @@ public class OrderService {
                 orderRequestDto.getAddress(),
                 orderRequestDto.getPostalCode(),
                 setOrderStateBasedOnTime(),
-                orderRequestDto.getTotalPrice()
         );
-
         // 주문 저장
         return orderRepository.save(order);
     }
@@ -77,5 +74,3 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 }
-
-

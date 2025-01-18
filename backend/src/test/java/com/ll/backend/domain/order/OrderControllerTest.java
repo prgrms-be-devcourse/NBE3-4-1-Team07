@@ -13,10 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -95,9 +93,6 @@ public class OrderControllerTest {
         }
         // 응답 상태 코드 확인
     }
-
-
-
 //    @Test
 //    @DisplayName("결제 시 관리자에게 배송 요청")
 //    void t2() throws Exception{
