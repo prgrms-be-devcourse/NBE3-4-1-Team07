@@ -10,5 +10,5 @@ public class OrderRequestDto {
     private String address;
     private String postalCode;
     private Integer totalPrice;
-    private List<ProductOrderDto> products;
+    private List<OrderDetailRequestDto> products;
 }

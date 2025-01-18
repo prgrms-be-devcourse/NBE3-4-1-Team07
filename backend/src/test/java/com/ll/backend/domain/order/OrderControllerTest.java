@@ -1,6 +1,10 @@
 package com.ll.backend.domain.order;
 
+import com.ll.backend.domain.order.controller.OrderController;
+import com.ll.backend.domain.order.dto.OrderDetailResponseDto;
+import com.ll.backend.domain.order.dto.OrderResponseDto;
 import com.ll.backend.domain.order.service.OrderService;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +16,12 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -28,7 +33,7 @@ public class OrderControllerTest {
     private MockMvc mvc;
 
     @Test
-    @DisplayName("장바구니 상품 정보를 바탕으로 주문 생성")
+    @DisplayName("주문 생성")
     void t1() throws Exception{
         String requestBody = """
                 {
@@ -60,6 +65,49 @@ public class OrderControllerTest {
         resultActions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Order successfully created."));
+    }
+
+    @Test
+    @DisplayName("주문 목록 조회")
+    void t2() throws Exception{
+
+        ResultActions resultActions = mvc.perform(
+                get("/admin/orderList")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
+        ).andDo(print());
+
+
+        List<OrderResponseDto> orderListWithDetails = orderService.getOrderListWithDetails();
+
+        for (int i = 0; i < orderListWithDetails.size(); i++) {
+            OrderResponseDto orderDto = orderListWithDetails.get(i);
+            resultActions
+                    .andExpect(handler().handlerType(OrderController.class))
+                    .andExpect(handler().methodName("getOrderList"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[" + i + "].id").value(orderDto.getId()))
+                    .andExpect(jsonPath("$[" + i + "].email").value(orderDto.getEmail()))
+                    .andExpect(jsonPath("$[" + i + "].address").value(orderDto.getAddress()))
+                    .andExpect(jsonPath("$[" + i + "].postalCode").value(orderDto.getPostalCode()))
+                    .andExpect(jsonPath("$[" + i + "].state").value(orderDto.getState()))
+                    .andExpect(jsonPath("$[" + i + "].totalPrice").value(orderDto.getTotalPrice()))
+                    .andExpect(jsonPath("$[" + i + "].orderDate").value(Matchers.startsWith(orderDto.getOrderDate().toString().substring(0, 19))))
+                    .andExpect(jsonPath("$[" + i + "].products").isArray());
+
+            // products 배열의 각 요소 검증
+            for (int j = 0; j < orderDto.getProducts().size(); j++) {
+                OrderDetailResponseDto detailDto = orderDto.getProducts().get(j);
+                resultActions
+                        .andExpect(jsonPath("$[" + i + "].products[" + j + "].order_detail_id").value(detailDto.getOrder_detail_id()))
+                        .andExpect(jsonPath("$[" + i + "].products[" + j + "].order_id").value(detailDto.getOrder_id()))
+                        .andExpect(jsonPath("$[" + i + "].products[" + j + "].productSummaryDto.name").value(detailDto.getProductSummaryDto().getName()))
+                        .andExpect(jsonPath("$[" + i + "].products[" + j + "].productSummaryDto.price").value(detailDto.getProductSummaryDto().getPrice()))
+                        .andExpect(jsonPath("$[" + i + "].products[" + j + "].productSummaryDto.imgPath").value(detailDto.getProductSummaryDto().getImgPath()))
+                        .andExpect(jsonPath("$[" + i + "].products[" + j + "].quantity").value(detailDto.getQuantity()));
+            }
+        }
+        // 응답 상태 코드 확인
     }
 
 //    @Test

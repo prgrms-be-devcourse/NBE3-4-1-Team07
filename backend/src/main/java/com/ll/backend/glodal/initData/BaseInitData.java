@@ -3,7 +3,7 @@ package com.ll.backend.glodal.initData;
 import com.ll.backend.domain.admin.entity.Admin;
 import com.ll.backend.domain.admin.service.AdminService;
 import com.ll.backend.domain.order.OrderStatus;
-import com.ll.backend.domain.order.dto.ProductOrderDto;
+import com.ll.backend.domain.order.dto.OrderDetailRequestDto;
 import com.ll.backend.domain.order.entity.Order;
 import com.ll.backend.domain.order.service.OrderService;
 import com.ll.backend.domain.orderDetail.service.OrderDetailService;
@@ -70,9 +70,9 @@ public class BaseInitData {
     public void work3() {
         if (orderService.count() > 0) return;
 
-        List<ProductOrderDto> productOrderDtoList = new ArrayList<>();
-        ProductOrderDto productOrderDto1 = new ProductOrderDto(1,3);
-        ProductOrderDto productOrderDto2 = new ProductOrderDto(2,4);
+        List<OrderDetailRequestDto> productOrderDtoList = new ArrayList<>();
+        OrderDetailRequestDto productOrderDto1 = new OrderDetailRequestDto(1,3);
+        OrderDetailRequestDto productOrderDto2 = new OrderDetailRequestDto(2,4);
         productOrderDtoList.add(productOrderDto1);
         productOrderDtoList.add(productOrderDto2);
 
