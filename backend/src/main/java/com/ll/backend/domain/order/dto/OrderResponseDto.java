@@ -1,19 +1,20 @@
 package com.ll.backend.domain.order.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class OrderResponseDto {
-    private int id;
+    private Integer id;
     private String email;
     private String address;
     private String postalCode;
     private String state;
-    private int totalPrice;
+    private Integer totalPrice;
     private LocalDateTime orderDate;
+    private List<OrderDetailResponseDto> products;
 }

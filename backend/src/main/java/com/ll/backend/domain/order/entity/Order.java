@@ -38,7 +38,7 @@ public class Order {
 
     private LocalDateTime orderDate;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
     private List<OrderDetail> orderDetails;
 
     public Order(String email, String address, String postalCode, OrderStatus state, int totalPrice) {

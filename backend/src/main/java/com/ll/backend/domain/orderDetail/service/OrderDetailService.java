@@ -1,6 +1,6 @@
 package com.ll.backend.domain.orderDetail.service;
 
-import com.ll.backend.domain.order.dto.ProductOrderDto;
+import com.ll.backend.domain.order.dto.OrderDetailRequestDto;
 import com.ll.backend.domain.order.entity.Order;
 import com.ll.backend.domain.orderDetail.entity.OrderDetail;
 import com.ll.backend.domain.orderDetail.repository.OrderDetailRepository;
@@ -19,7 +19,7 @@ public class OrderDetailService {
     private final OrderDetailRepository orderDetailRepository;
     private final ProductRepository productRepository;
 
-    public void createOrderDetails(Order order, List<ProductOrderDto> products) {
+    public void createOrderDetails(Order order, List<OrderDetailRequestDto> products) {
         for(int i = 0; i < products.size(); i++) {
             Optional<Product> productOptional = productRepository.findById(products.get(i).getProductId());
             if(productOptional.isPresent()) {
