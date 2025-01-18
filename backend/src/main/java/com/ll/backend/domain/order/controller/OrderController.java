@@ -1,5 +1,6 @@
 package com.ll.backend.domain.order.controller;
 
+import com.ll.backend.domain.order.dto.OrderDeliveryRequestDto;
 import com.ll.backend.domain.order.dto.OrderRequestDto;
 import com.ll.backend.domain.order.entity.Order;
 import com.ll.backend.domain.order.service.OrderService;
@@ -7,10 +8,7 @@ import com.ll.backend.domain.orderdetail.service.OrderDetailService;
 import com.ll.backend.domain.order.dto.OrderResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,6 +35,16 @@ public class OrderController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(orderList);
+    }
+
+    @PutMapping("/admin/delivery")
+    public ResponseEntity<String> updateOrderDeliveryStatus(@RequestBody OrderDeliveryRequestDto requestDto) {
+        try {
+            orderService.updateDeliveryStatus(requestDto);
+            return ResponseEntity.ok("Delivery status updated successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 }
