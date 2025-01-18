@@ -30,7 +30,6 @@ public class OrderController {
         return ResponseEntity.ok(new OrderCreated(order.getId(),"Order successfully created."));
     }
 
-
     @GetMapping("/admin/orderList")
     public ResponseEntity<List<OrderResponseDto>> getOrderList() {
         List<OrderResponseDto> orderList = orderService.getOrderList();
@@ -39,7 +38,5 @@ public class OrderController {
         }
         return ResponseEntity.ok(orderList);
     }
-
-
 
 }
