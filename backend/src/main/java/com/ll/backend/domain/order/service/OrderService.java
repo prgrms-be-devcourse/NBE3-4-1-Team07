@@ -78,6 +78,7 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
+    //배송 상태 변경
     @Transactional
     public void updateDeliveryStatus(OrderDeliveryRequestDto orderDeliveryRequestDto){
         List<Integer> orderIds = orderDeliveryRequestDto.getId();

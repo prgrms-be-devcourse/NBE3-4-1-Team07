@@ -14,11 +14,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -94,6 +96,24 @@ public class OrderControllerTest {
                     .andExpect(jsonPath("$[" + i + "].orderDate").value(Matchers.startsWith(orderDto.getOrderDate().toString().substring(0, 19))));
         }
         // 응답 상태 코드 확인
+    }
+
+    @Test
+    @DisplayName("배송 상태 기능 구현")
+    void t3() throws Exception {
+        String requestBody = """
+        {
+            "id": [59, 60]
+        }
+        """;
+
+        mvc.perform(put("/admin/delivery")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
+                        .characterEncoding(StandardCharsets.UTF_8))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Delivery status updated successfully."))
+                .andDo(print());
     }
 
 

@@ -37,6 +37,7 @@ public class OrderController {
         return ResponseEntity.ok(orderList);
     }
 
+    //배송 상태
     @PutMapping("/admin/delivery")
     public ResponseEntity<String> updateOrderDeliveryStatus(@RequestBody OrderDeliveryRequestDto requestDto) {
         try {
