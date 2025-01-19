@@ -3,6 +3,7 @@ package com.ll.backend.domain.product.entity;
 import com.ll.backend.domain.admin.entity.Admin;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 public class Product {
     @Id
     @Column(name = "product_id")
@@ -29,22 +31,19 @@ public class Product {
     private LocalDateTime modify_date;
 
     private String imgPath;
-
+    private String description;
     @ManyToOne
     private Admin admin;
 
-    public Product(String name, int price, int quantity, String imgPath, Admin admin) {
+    public Product(String name, int price, int quantity, String imgPath, String description, Admin admin) {
         this.name = name;
         this.price = price;
         this.quantity = quantity;
         this.modify_date = LocalDateTime.now();
         this.created_date = LocalDateTime.now();
         this.imgPath = imgPath;
+        this.description = description;
         this.admin = admin;
     }
 
-
-    public Product() {
-
-    }
 }

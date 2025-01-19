@@ -4,6 +4,7 @@ import com.ll.backend.domain.product.dto.ProductReqDto;
 import com.ll.backend.domain.product.entity.Product;
 import com.ll.backend.domain.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +26,18 @@ public class ProductController {
         List<Product> productList = this.productService.findAll();
         return new ResponseEntity<>(productList, HttpStatus.OK);
     }
+
+
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping("/admin/product/{id}")
+    public ResponseEntity<Product> getProduct(@PathVariable int id, Principal principal){
+        Optional<Product> product = productService.findById(id);
+
+        return product.map(value ->
+                new ResponseEntity<>(value, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/admin/product/create")

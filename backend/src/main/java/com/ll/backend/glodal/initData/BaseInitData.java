@@ -54,11 +54,10 @@ public class BaseInitData {
 
         Optional<Admin> admin = adminService.getAdmin("user1");
         if (admin.isPresent()) {
-            Product product1 = new Product("콜롬비아 원두", 5000, 3, "", admin.get());
-            Product product2 = new Product("브라질 원두", 7000, 5, "", admin.get());
-            Product product3 = new Product("아라비카 원두", 10000, 5, "", admin.get());
-            Product product4 = new Product("케냐 원두", 7000, 5, "", admin.get());
-
+            Product product1 = new Product("콜롬비아 원두", 5000, 3, "", "",admin.get());
+            Product product2 = new Product("브라질 원두", 7000, 5, "", "", admin.get());
+            Product product3 = new Product("아라비카 원두", 10000, 5, "", "",admin.get());
+            Product product4 = new Product("케냐 원두", 7000, 5, "", "",admin.get());
             productService.initDataProduct(product1);
             productService.initDataProduct(product2);
             productService.initDataProduct(product3);

@@ -1,49 +1,42 @@
-"use client";
+import React from 'react';
+import { Modal, Box, FormControl, TextField, Button } from '@mui/material';
+import Image from 'next/image';
+import { Product } from "@/app/types/Product";
 
-import React from "react";
-import {Box, Button, FormControl, Modal, TextField} from "@mui/material";
-import Image from "next/image";
-import {Product} from "@/app/types/Product";
-
-type ProductModalProps = {
-    isModalOpen: boolean;
+interface ProductDetailModalProps {
+    open: boolean;
+    onClose: () => void;
     formValues: Product | null;
-    handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    handleSave: () => void;
-    handleClose: () => void;
-};
+    onSave: (product: Product) => void;
+    onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
 
-export default function ProductModal({
-                                         isModalOpen,
-                                         formValues,
-                                         handleInputChange,
-                                         handleSave,
-                                         handleClose,
-                                     }: ProductModalProps) {
+const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
+                                                                   open,
+                                                                   onClose,
+                                                                   formValues,
+                                                                   onSave,
+                                                                   onInputChange
+                                                               }) => {
     return (
-        <Modal
-            open={isModalOpen}
-            onClose={handleClose}
-            aria-labelledby="product-modal-title"
-            aria-describedby="product-modal-description"
-        >
+        <Modal open={open} onClose={onClose}>
             <Box
                 style={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
                     width: 600,
-                    backgroundColor: "white",
-                    border: "2px solid #000",
-                    boxShadow: "24px",
-                    padding: "16px",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "16px",
+                    backgroundColor: 'white',
+                    border: '2px solid #000',
+                    boxShadow: '24px',
+                    padding: '16px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px',
                 }}
             >
-                <Box style={{display: "flex", gap: "16px", alignItems: "flex-start"}}>
+                <Box style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
                     <Box
                         style={{
                             width: "150px",
@@ -63,13 +56,13 @@ export default function ProductModal({
                             />
                         )}
                     </Box>
-                    <Box style={{flex: 1}}>
+                    <Box style={{ flex: 1 }}>
                         <FormControl fullWidth>
                             <TextField
                                 label="상품명"
                                 name="name"
                                 value={formValues?.name || ""}
-                                onChange={handleInputChange}
+                                onChange={onInputChange}
                                 margin="normal"
                             />
                             <TextField
@@ -77,14 +70,14 @@ export default function ProductModal({
                                 name="price"
                                 type="number"
                                 value={formValues?.price || ""}
-                                onChange={handleInputChange}
+                                onChange={onInputChange}
                                 margin="normal"
                             />
                             <TextField
                                 label="설명"
                                 name="description"
                                 value={formValues?.description || ""}
-                                onChange={handleInputChange}
+                                onChange={onInputChange}
                                 margin="normal"
                                 multiline
                                 rows={3}
@@ -94,22 +87,23 @@ export default function ProductModal({
                                 name="quantity"
                                 type="number"
                                 value={formValues?.quantity || ""}
-                                onChange={handleInputChange}
+                                onChange={onInputChange}
                                 margin="normal"
                             />
                         </FormControl>
                     </Box>
                 </Box>
-                {/* Bottom: Buttons */}
-                <Box style={{display: "flex", justifyContent: "flex-end", gap: "8px"}}>
-                    <Button variant="contained" color="primary" onClick={handleSave}>
+                <Box style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                    <Button variant="contained" color="primary" onClick={() => onSave(formValues!)}>
                         저장
                     </Button>
-                    <Button variant="outlined" onClick={handleClose}>
+                    <Button variant="outlined" onClick={onClose}>
                         닫기
                     </Button>
                 </Box>
             </Box>
         </Modal>
     );
-}
+};
+
+export default ProductDetailModal;
