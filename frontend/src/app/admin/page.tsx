@@ -6,10 +6,8 @@ import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
 import Image from "next/image";
 import {Product, ProductResponseDto} from "@/app/types/Product";
-import {Button, FormControl, Modal , TextField} from "@mui/material";
+import {Button, FormControl, Modal , TextField, TableContainer, TableCell, TableBody, TableRow, Table, TableHead} from "@mui/material";
 import {Box} from "@mui/system";
-import { TableContainer, TableCell, TableBody, TableRow, Table, TableHead, } from "@mui/material";
-
 
 const getOrderList = async () => {
   const res = await fetch("/api/admin/orderList");
@@ -33,24 +31,30 @@ const getProductList = async () => {
   return data;
 };
 
-
-
 export default function admin() {
-  // 주문 목록 조회가 디폴트
   const [activeMenu, setActiveMenu] = useState("orderList");
+  const [filters, setFilters] = useState({
+        searchType: "",
+        keyword: "",
+        dateFrom: "",
+        dateTo: "",
+    });
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [isProductModalOpen, setProductModalOpen] = useState(false);
   const [isOrderModalOpen, setOrderModalOpen] = useState(false);
   const [formValues, setFormValues] = useState<Product | null>(null);
-    const [orderDetail, setOrderDetail] = useState<OrderDetailResponseDto | null>(null);
+  const [orderDetail, setOrderDetail] = useState<OrderDetailResponseDto | null>(null);
+  const [selectedOrders, setSelectedOrders] = useState<Set<number>>(new Set());
+  const [selectAll, setSelectAll] = useState(false);
+
 
   useEffect(() => {
     // 데이터 fetching
     const fetchData = async () => {
       try {
         if(activeMenu == "orderList"){
-          const data: OrderResponseDto = await getOrderList();
+          const data = await getOrderList();
           setOrders(data);
         } else if(activeMenu == "productList"){
           const data: ProductResponseDto = await getProductList();
@@ -62,18 +66,23 @@ export default function admin() {
     };
 
     fetchData();
-  }, [activeMenu]); // 컴포넌트가 처음 렌더링될 때 한 번만 호출
+  }, [activeMenu]);
 
-  const [filters, setFilters] = useState({
-    searchType: "",
-    keyword: "",
-    dateFrom: "",
-    dateTo: "",
-  });
+  const fetchOrders = async () => {
+        try {
+            const res = await fetch("/api/admin/orderList");
+            if (!res.ok) {
+                throw new Error("주문 목록 조회 실패");
+            }
+            const data = await res.json();
+            setOrders(data);
+        } catch (error) {
+            console.error("주문 목록 조회 에러:", error);
+            alert("주문 목록 조회 중 문제가 발생했습니다.");
+        }
+    };
 
   const handleMenuClick = (menu: string) => setActiveMenu(menu);
-
-
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters({ ...filters, [name]: value });
@@ -101,7 +110,7 @@ export default function admin() {
     setProductModalOpen(false);
     setFormValues(null);
   };
-    const handleProductSave = async () => {
+  const handleProductSave = async () => {
         try {
             if (formValues?.id === 0) {
                 // 새로운 상품 추가
@@ -167,6 +176,53 @@ export default function admin() {
         }));
     };
 
+    const handleCheckboxChange = (orderId: number, isChecked: boolean) => {
+        setSelectedOrders((prevSelectedOrders) => {
+            const updatedSelectedOrders = new Set(prevSelectedOrders);
+            if (isChecked) {
+                updatedSelectedOrders.add(orderId);
+            } else {
+                updatedSelectedOrders.delete(orderId);
+            }
+            setSelectAll(updatedSelectedOrders.size === orders.length);
+            return updatedSelectedOrders;
+        });
+    };
+    const handleSelectAllChange = (isChecked: boolean) => {
+        setSelectAll(isChecked);
+        if (isChecked) {
+            const allOrderIds = orders.map(order => order.id);
+            setSelectedOrders(new Set(allOrderIds));
+        } else {
+            setSelectedOrders(new Set());
+        }
+    };
+
+    const handleDelivery = async () => {
+        try {
+            const selectedOrderIds = Array.from(selectedOrders);
+            const orderDeliveryDto = { id: selectedOrderIds };
+
+            if (selectedOrderIds.length === 0) {
+                alert("선택된 주문이 없습니다.");
+                return;
+            }
+
+            const res = await fetch("/api/admin/delivery", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(orderDeliveryDto),
+            });
+            alert("배송 처리 성공");
+            // 수정 후 다시 조회
+            await fetchOrders();
+        } catch (error) {
+            alert("배송 처리 중 문제가 발생했습니다.");
+        }
+    };
+
   return (
       <div className="flex h-screen">
         <Sidebar backgroundColor="#FBFBFB" className="min-h-full">
@@ -223,14 +279,15 @@ export default function admin() {
                       조회
                     </button>
                   </div>
-
-                  {/* User List */}
+                    <Button onClick={handleDelivery}>배송</Button>
                   <div>
                     <table className="w-full border-collapse border border-gray-300">
                       <thead>
                       <tr className="bg-gray-100">
                         <th className="border px-4 py-2">
-                          <input type="checkbox"/>
+                          <input type="checkbox"
+                                 checked={selectAll} // 전체 선택 여부 반영
+                                 onChange={(e) => handleSelectAllChange(e.target.checked)}/>
                         </th>
                         <th className="border px-4 py-2">주문번호</th>
                         <th className="border px-4 py-2">이메일</th>
@@ -246,7 +303,11 @@ export default function admin() {
                       {orders.map((order) => (
                           <tr key={order.id} className="text-center">
                             <td className="border px-4 py-2">
-                              <input type="checkbox"/>
+                              <input type="checkbox"
+                                     checked={selectedOrders.has(order.id)}
+                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                         handleCheckboxChange(order.id, e.target.checked)
+                                     }/>
                             </td>
                             <td className="border px-4 py-2">{order.id}</td>
                             <td className="border px-4 py-2">{order.email}</td>
