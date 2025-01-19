@@ -24,3 +24,12 @@ export interface OrderRequestDto {
     quantity: number;
   }[];
 }
+
+export interface OrderDetailResponseDto {
+  products: {
+    name: string;
+    price: number;
+    quantity: number;
+    imgPath: string;
+  }[];
+}
