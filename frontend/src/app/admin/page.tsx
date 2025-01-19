@@ -4,11 +4,11 @@ import React, { useEffect, useState } from "react";
 import {Order, OrderDetailResponseDto} from "../types/Order";
 import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
-import Image from "next/image";
 import {Product, ProductResponseDto} from "@/app/types/Product";
-import {Button} from "@mui/material";;
 import OrderDetailModal from "@/app/admin/components/OrderDetailModal";
 import ProductDetailModal from "@/app/admin/components/ProductDetailModal";
+import ProductList from "@/app/admin/components/ProductList";
+import OrderList from "@/app/admin/components/OrderList";
 
 const getOrderList = async () => {
   const res = await fetch("/api/admin/orderList");
@@ -232,134 +232,23 @@ export default function admin() {
         </Sidebar>
         <div className="w-3/4 p-4 flex-grow overflow-auto">
           {activeMenu === "orderList" && (
-            <div>
-              {
-                <div className="flex-grow overflow-auto">
-                  <h1 className="text-xl font-bold mb-4">주문 목록</h1>
-
-                  {/* Filters */}
-                  <div className="flex items-center space-x-2 mb-4">
-                    <select
-                        name="searchType"
-                        value={filters.searchType}
-                        onChange={handleFilterChange}
-                        className="border rounded px-2 py-1"
-                    >
-                      <option value="아이디">이메일</option>
-                    </select>
-                    <input
-                        type="text"
-                        name="keyword"
-                        value={filters.keyword}
-                        onChange={handleFilterChange}
-                        placeholder="검색어"
-                        className="border rounded px-2 py-1"
-                    />
-
-                    <input
-                        type="date"
-                        name="dateFrom"
-                        value={filters.dateFrom}
-                        onChange={handleFilterChange}
-                        className="border rounded px-2 py-1"
-                    />
-                    <span>~</span>
-                    <input
-                        type="date"
-                        name="dateTo"
-                        value={filters.dateTo}
-                        onChange={handleFilterChange}
-                        className="border rounded px-2 py-1"
-                    />
-                    <button className="bg-gray-800 text-white px-4 py-2 rounded">
-                      조회
-                    </button>
-                  </div>
-                    <Button onClick={handleDelivery}>배송</Button>
-                  <div>
-                    <table className="w-full border-collapse border border-gray-300">
-                      <thead>
-                      <tr className="bg-gray-100">
-                        <th className="border px-4 py-2">
-                          <input type="checkbox"
-                                 checked={selectAll} // 전체 선택 여부 반영
-                                 onChange={(e) => handleSelectAllChange(e.target.checked)}/>
-                        </th>
-                        <th className="border px-4 py-2">주문번호</th>
-                        <th className="border px-4 py-2">이메일</th>
-                        <th className="border px-4 py-2">주문일자</th>
-                        <th className="border px-4 py-2">주소</th>
-                        <th className="border px-4 py-2">우편번호</th>
-                        <th className="border px-4 py-2">총 금액</th>
-                        <th className="border px-4 py-2">상태</th>
-                        <th className="border px-4 py-2">주문상세</th>
-                      </tr>
-                      </thead>
-                      <tbody>
-                      {orders.map((order) => (
-                          <tr key={order.id} className="text-center">
-                            <td className="border px-4 py-2">
-                              <input type="checkbox"
-                                     checked={selectedOrders.has(order.id)}
-                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                         handleCheckboxChange(order.id, e.target.checked)
-                                     }/>
-                            </td>
-                            <td className="border px-4 py-2">{order.id}</td>
-                            <td className="border px-4 py-2">{order.email}</td>
-                            <td className="border px-4 py-2">{order.orderDate}</td>
-                            <td className="border px-4 py-2">{order.address}</td>
-                            <td className="border px-4 py-2">{order.postalCode}</td>
-                            <td className="border px-4 py-2">{order.totalPrice}</td>
-                            <td className="border px-4 py-2">{order.state}</td>
-                            <td className="border px-4 py-2">
-                              <button className="bg-blue-500 text-white px-4 py-1 rounded"
-                              onClick={() => handleOrderDetailModalOpen(order.id)}>
-                                정보
-                              </button>
-                            </td>
-                          </tr>
-                      ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              }
-              {/* ... */}
-            </div>)}
+              <OrderList
+                  orders={orders}
+                  selectedOrders={selectedOrders}
+                  selectAll={selectAll}
+                  handleSelectAllChange={handleSelectAllChange}
+                  handleCheckboxChange={handleCheckboxChange}
+                  handleDelivery={handleDelivery}
+                  handleFilterChange={handleFilterChange}
+                  handleOrderDetailModalOpen={handleOrderDetailModalOpen}
+                  filters={filters}
+              />)}
           {activeMenu === "productList" && (
-              <div>
-                <h1 className="text-xl font-bold mb-4">상품 목록</h1>
-                <Button onClick={handleAddProduct}>추가</Button>
-                <ul className="w-full space-y-2 mt-3">
-                  {products.map((product: Product) => (
-                      <li key={product.id} className="flex justify-between items-center p-3 border rounded-lg hover:bg-gray-50">
-                        <div className="flex items-center gap-4">
-                          <div className="w-20 h-20 relative">
-                            <Image
-                                src={product.imgPath}
-                                alt={product.name}
-                                fill
-                                className="object-cover rounded-lg"
-                                sizes="(max-width: 768px) 80px, 80px"
-                            />
-                          </div>
-                          <div>
-                            <h6 className="font-semibold">{product.name}</h6>
-                            <p className="text-sm text-gray-600">{product.description}</p>
-                            <p className="text-blue-600 font-medium">{product.price.toLocaleString()}원</p>
-                          </div>
-                        </div>
-                        <button
-                            className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition"
-                            onClick={() => handleProductDetailModalOpen(product.id)}
-                        >
-                          상세
-                        </button>
-                      </li>
-                  ))}</ul>
-              </div>)}
-        </div>
+              <ProductList
+                  products={products}
+                  onAddProductClick={handleAddProduct}
+                  onProductDetailClick={handleProductDetailModalOpen}
+              />)}
           <ProductDetailModal
               open={isProductDetailModalOpen}
               onClose={handleProductDetailModalClose}
@@ -372,6 +261,7 @@ export default function admin() {
               onClose={handleOrderDetailModalClose}
               orderDetail={orderDetail}
           />
+        </div>
       </div>
   );
 }
