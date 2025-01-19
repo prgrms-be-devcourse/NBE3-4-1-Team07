@@ -1,4 +1,9 @@
 spring:
+  #sql
+  sql:
+    init:
+      # DB에 데이터 없으면 always 후 never로 끄지않으면 키 충돌 발생
+      mode: never
   # email
   application:
     name: sbb
@@ -33,6 +38,7 @@ spring:
         format_sql: true
         highlight_sql: true
         use_sql_comments: true
+    defer-datasource-initialization: true
 server:
   port: 8080
 logging:
