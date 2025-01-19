@@ -30,9 +30,9 @@ async function fetchOrderDetail(id: number): Promise<OrderDetailResponseDto> {
 
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: { id: number } }
 ) {
-    const { id } = await params;
+    const { id } = params;
     const orderDetail = await fetchOrderDetail(Number(id));
     return NextResponse.json(orderDetail);
 }

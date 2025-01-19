@@ -1,21 +1,17 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {Order, OrderDetailResponseDto, OrderResponseDto} from "../types/Order";
+import {Order, OrderDetailResponseDto} from "../types/Order";
 import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
 import Image from "next/image";
 import {Product, ProductResponseDto} from "@/app/types/Product";
-import {Button, FormControl, Modal , TextField, TableContainer, TableCell, TableBody, TableRow, Table, TableHead} from "@mui/material";
-import {Box} from "@mui/system";
+import {Button} from "@mui/material";;
+import OrderDetailModal from "@/app/admin/components/OrderDetailModal";
+import ProductDetailModal from "@/app/admin/components/ProductDetailModal";
 
 const getOrderList = async () => {
   const res = await fetch("/api/admin/orderList");
-
-  if (!res.ok) {
-    throw new Error("주문 목록 조회 실패");
-  }
-
   const data = await res.json();
   return data;
 };
@@ -41,8 +37,8 @@ export default function admin() {
     });
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
-  const [isProductModalOpen, setProductModalOpen] = useState(false);
-  const [isOrderModalOpen, setOrderModalOpen] = useState(false);
+  const [isProductDetailModalOpen, setIsProductDetailModalOpen] = useState(false);
+  const [isOrderDetailModalOpen, setIsOrderDetailModalOpen] = useState(false);
   const [formValues, setFormValues] = useState<Product | null>(null);
   const [orderDetail, setOrderDetail] = useState<OrderDetailResponseDto | null>(null);
   const [selectedOrders, setSelectedOrders] = useState<Set<number>>(new Set());
@@ -88,7 +84,7 @@ export default function admin() {
     setFilters({ ...filters, [name]: value });
   };
 
-  const handleProductModalOpen = async (id: number) => {
+  const handleProductDetailModalOpen = async (id: number) => {
     try{
       const response: Response = await fetch(`/api/admin/product/${id}`);
 
@@ -99,15 +95,15 @@ export default function admin() {
       const data: Product = await response.json();
 
       setFormValues(data);
-      setProductModalOpen(true);
+      setIsProductDetailModalOpen(true);
       return data;
     } catch(error){
       console.error(error);
       return null;
     }
   };
-  const handleProductModalClose = () => {
-    setProductModalOpen(false);
+  const handleProductDetailModalClose = () => {
+    setIsProductDetailModalOpen(false);
     setFormValues(null);
   };
   const handleProductSave = async () => {
@@ -141,7 +137,7 @@ export default function admin() {
             setProducts(data.products);
 
             alert("저장되었습니다.");
-            handleProductModalClose();
+            handleProductDetailModalClose();
         } catch (error) {
             console.error("상품 저장 오류 : " + error);
         }
@@ -150,7 +146,7 @@ export default function admin() {
 
   }
 
-  const handleOrderModalOpen = async (id: number) => {
+  const handleOrderDetailModalOpen = async (id: number) => {
         try {
             const response: Response = await fetch(`/api/admin/order/${id}`);
             if (!response.ok) {
@@ -158,17 +154,17 @@ export default function admin() {
             }
             const data: OrderDetailResponseDto = await response.json();
             setOrderDetail(data);
-            setOrderModalOpen(true);
+            setIsOrderDetailModalOpen(true);
         } catch (error) {
             console.error("주문 상세 정보 조회 실패", error);
         }
     };
-  const handleOrderModalClose = () => {
-      setOrderModalOpen(false);
+  const handleOrderDetailModalClose = () => {
+      setIsOrderDetailModalOpen(false);
       setOrderDetail(null);
   }
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormValues((prev) => ({
             ...prev!,
@@ -176,7 +172,7 @@ export default function admin() {
         }));
     };
 
-    const handleCheckboxChange = (orderId: number, isChecked: boolean) => {
+  const handleCheckboxChange = (orderId: number, isChecked: boolean) => {
         setSelectedOrders((prevSelectedOrders) => {
             const updatedSelectedOrders = new Set(prevSelectedOrders);
             if (isChecked) {
@@ -188,7 +184,7 @@ export default function admin() {
             return updatedSelectedOrders;
         });
     };
-    const handleSelectAllChange = (isChecked: boolean) => {
+  const handleSelectAllChange = (isChecked: boolean) => {
         setSelectAll(isChecked);
         if (isChecked) {
             const allOrderIds = orders.map(order => order.id);
@@ -198,7 +194,7 @@ export default function admin() {
         }
     };
 
-    const handleDelivery = async () => {
+  const handleDelivery = async () => {
         try {
             const selectedOrderIds = Array.from(selectedOrders);
             const orderDeliveryDto = { id: selectedOrderIds };
@@ -318,7 +314,7 @@ export default function admin() {
                             <td className="border px-4 py-2">{order.state}</td>
                             <td className="border px-4 py-2">
                               <button className="bg-blue-500 text-white px-4 py-1 rounded"
-                              onClick={() => handleOrderModalOpen(order.id)}>
+                              onClick={() => handleOrderDetailModalOpen(order.id)}>
                                 정보
                               </button>
                             </td>
@@ -356,7 +352,7 @@ export default function admin() {
                         </div>
                         <button
                             className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition"
-                            onClick={() => handleProductModalOpen(product.id)}
+                            onClick={() => handleProductDetailModalOpen(product.id)}
                         >
                           상세
                         </button>
@@ -364,186 +360,18 @@ export default function admin() {
                   ))}</ul>
               </div>)}
         </div>
-        <Modal
-            open={isProductModalOpen}
-            onClose={handleProductModalClose}
-            aria-labelledby="product-modal-title"
-            aria-describedby="product-modal-description"
-        >
-          <Box
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: 600,
-                backgroundColor: 'white',
-                border: '2px solid #000',
-                boxShadow: '24px',
-                padding: '16px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px',
-              }}
-          >
-              <Box style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
-                  <Box
-                      style={{
-                          width: "150px",
-                          height: "150px",
-                          position: "relative",
-                          border: "1px solid #ddd",
-                          borderRadius: "8px",
-                          overflow: "hidden",
-                      }}
-                  >
-                      {formValues?.imgPath && (
-                          <Image
-                              src={formValues.imgPath}
-                              alt={formValues.name}
-                              layout="fill"
-                              objectFit="cover"
-                          />
-                      )}
-                  </Box>
-                  <Box style={{ flex: 1 }}>
-                      <FormControl fullWidth>
-                          <TextField
-                              label="상품명"
-                              name="name"
-                              value={formValues?.name || ""}
-                              onChange={handleInputChange}
-                              margin="normal"
-                          />
-                          <TextField
-                              label="가격"
-                              name="price"
-                              type="number"
-                              value={formValues?.price || ""}
-                              onChange={handleInputChange}
-                              margin="normal"
-                          />
-                          <TextField
-                              label="설명"
-                              name="description"
-                              value={formValues?.description || ""}
-                              onChange={handleInputChange}
-                              margin="normal"
-                              multiline
-                              rows={3}
-                          />
-                          <TextField
-                              label="수량"
-                              name="quantity"
-                              type="number"
-                              value={formValues?.quantity || ""}
-                              onChange={handleInputChange}
-                              margin="normal"
-                          />
-                      </FormControl>
-                  </Box>
-              </Box>
-            {/* Bottom: Buttons */}
-            <Box style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-              <Button variant="contained" color="primary" onClick={handleProductSave}>
-                저장
-              </Button>
-              <Button variant="outlined" onClick={handleProductModalClose}>
-                닫기
-              </Button>
-            </Box>
-          </Box>
-        </Modal>
-          <Modal
-              open={isOrderModalOpen}
-              onClose={handleOrderModalClose}
-              aria-labelledby="product-modal-title"
-              aria-describedby="product-modal-description"
-          >
-              <Box
-                  style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      width: 600,
-                      backgroundColor: 'white',
-                      border: '2px solid #000',
-                      boxShadow: '24px',
-                      padding: '16px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '16px',
-                  }}
-              >
-                  <Box style={{ display: "flex", gap: "16px", flexDirection: "column" }}>
-                      <TableContainer>
-                          <Table>
-                              <TableHead>
-                                  <TableRow>
-                                      <TableCell>상품명</TableCell>
-                                      <TableCell>가격</TableCell>
-                                      <TableCell>수량</TableCell>
-                                  </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                  {orderDetail?.products.map((product, index) => (
-                                      <TableRow key={index}>
-                                          <TableCell>
-                                              <TextField
-                                                  label="상품명"
-                                                  name={`name-${index}`}
-                                                  margin="normal"
-                                                  value={product.name}
-                                                  slotProps={{
-                                                      input: {
-                                                          readOnly: true,
-                                                      },
-                                                  }}
-                                              />
-                                          </TableCell>
-                                          <TableCell>
-                                              <TextField
-                                                  label="가격"
-                                                  name={`price-${index}`}
-                                                  type="number"
-                                                  margin="normal"
-                                                  value={product.price}
-                                                  slotProps={{
-                                                      input: {
-                                                          readOnly: true,
-                                                      },
-                                                  }}
-                                              />
-                                          </TableCell>
-                                          <TableCell>
-                                              <TextField
-                                                  label="수량"
-                                                  name={`quantity-${index}`}
-                                                  type="number"
-                                                  margin="normal"
-                                                  value={product.quantity}
-                                                  slotProps={{
-                                                      input: {
-                                                          readOnly: true,
-                                                      },
-                                                  }}
-                                              />
-                                          </TableCell>
-                                      </TableRow>
-                                  ))}
-                              </TableBody>
-                          </Table>
-                      </TableContainer>
-                  </Box>
-                  {/* Bottom: Buttons */}
-                  <Box style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                      <Button variant="outlined" onClick={handleOrderModalClose}>
-                          닫기
-                      </Button>
-                  </Box>
-              </Box>
-          </Modal>
+          <ProductDetailModal
+              open={isProductDetailModalOpen}
+              onClose={handleProductDetailModalClose}
+              formValues={formValues}
+              onSave={handleProductSave}
+              onInputChange={handleInputChange}
+          />
+          <OrderDetailModal
+              open={isOrderDetailModalOpen}
+              onClose={handleOrderDetailModalClose}
+              orderDetail={orderDetail}
+          />
       </div>
   );
 }
