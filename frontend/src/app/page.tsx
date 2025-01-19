@@ -88,7 +88,7 @@ export default function Home() {
   // 결제버튼 클릭시 주문 처리
   const handlePayment = async () => {
     try {
-      const orderDate: OrderRequestDto = {
+      const orderData: OrderRequestDto = {
         email: orderInfo.email,
         address: orderInfo.address,
         postalCode: orderInfo.postcode,
@@ -98,23 +98,34 @@ export default function Home() {
           quantity: item.quantity
         }))
       };
+      
+      console.log('서버로 보내는 데이터:', orderData);
+      console.log('JSON 형태:', JSON.stringify(orderData, null, 2));
+
       const response = await fetch("/api/main/order", {
         method: "POST",
-        body: JSON.stringify(orderDate),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderData),
       });
 
       if (!response.ok) {
+        const errorData = await response.text(); // 에러 메시지 확인
+        console.error('서버 응답:', errorData);
         throw new Error("주문에 실패했습니다.");
       }
 
       const data = await response.json();
-      console.log(data);
+      console.log('주문 성공:', data);
 
       // 주문 성공 시 카트 비우기
       setCartItems([]);
       setOrderInfo({ email: '', address: '', postcode: '' });
+      alert('주문이 성공적으로 완료되었습니다!');
     } catch (error) {
-      console.error(error);
+      console.error('주문 처리 중 오류:', error);
+      alert('주문 처리 중 오류가 발생했습니다.');
     }
   };
 
@@ -258,6 +269,8 @@ export default function Home() {
                       type="email"
                       id="email"
                       className="w-full p-2 border rounded"
+                      value={orderInfo.email}
+                      onChange={handleInputChange}
                   />
                 </div>
                 <div>
@@ -268,6 +281,8 @@ export default function Home() {
                       type="text"
                       id="address"
                       className="w-full p-2 border rounded"
+                      value={orderInfo.address}
+                      onChange={handleInputChange}
                   />
                 </div>
                 <div>
@@ -278,6 +293,8 @@ export default function Home() {
                       type="text"
                       id="postcode"
                       className="w-full p-2 border rounded"
+                      value={orderInfo.postcode}
+                      onChange={handleInputChange}
                   />
                 </div>
                 <div className="text-sm">
