@@ -1,77 +1,39 @@
-import { Order, OrderRequestDto, OrderResponseDto } from "@/app/types/Order";
+import { Order } from "@/app/types/Order";
 import { NextResponse } from "next/server";
 
-let orders: Order[] = [
-  {
-    id: 1,
-    address: "서울시 강남구 역삼동 123-45",
-    email: "test1@test.com",
-    postalCode: "00000",
-    state: "주문접수",
-    totalPrice: 100000,
-    orderDate: "2025-01-15 12:00:00",
-  },
-  {
-    id: 2,
-    address: "서울시 강남구 역삼동 123-45",
-    email: "test2@test.com",
-    postalCode: "00000",
-    state: "주문접수",
-    totalPrice: 100000,
-    orderDate: "2025-01-15 12:00:00",
-  },
-  {
-    id: 3,
-    address: "강원도 원주시 효동로 123-45",
-    email: "test3@test.com",
-    postalCode: "00000",
-    state: "주문접수",
-    totalPrice: 100000,
-    orderDate: "2025-01-15 12:00:00",
-  },
-  {
-    id: 4,
-    address: "충청남도 천안시 동남구 목천읍 중앙로 123-45",
-    email: "test4@test.com",
-    postalCode: "00000",
-    state: "주문접수",
-    totalPrice: 100000,
-    orderDate: "2025-01-15 12:00:00",
-  },
-  {
-    id: 5,
-    address: "경기도 안산시 단대로 123-45",
-    email: "test5@test.com",
-    postalCode: "00000",
-    state: "주문접수",
-    totalPrice: 100000,
-    orderDate: "2025-01-15 12:00:00",
-  },
-  {
-    id: 6,
-    address: "경상남도 합천군 합천읍 합천로 123-45",
-    email: "test6@test.com",
-    postalCode: "00000",
-    state: "주문접수",
-    totalPrice: 100000,
-    orderDate: "2025-01-15 12:00:00",
-  },
-];
 
-const data: OrderResponseDto = {
-  orders,
-};
-
-export function getOrderList(){
-  return orders;
-}
-
-export function addOrder(order: Order){
-  orders.push(order)
-}
-
-//GET /api/admin/orderList
-
+// GET /admin/orderList
 export async function GET() {
-  return NextResponse.json(data);
+  try {
+
+    const response = await fetch('http://localhost:8080/admin/orderList');
+    const rawData = await response.json();
+
+    const orderList: Order[] = rawData.map((item: any) => ({
+      id: item.id,
+      email: item.email,
+      address: item.address,
+      postalCode: item.postalCode,
+      state: item.state,
+      totalPrice: item.totalPrice,
+      orderDate: formatDate(item.orderDate),
+    }));
+
+    return NextResponse.json(orderList);
+  } catch (error) {
+    console.error('주문 목록 조회 실패:', error);
+    throw error;
+  }
+}
+
+// 날짜 형식 변환 함수
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
