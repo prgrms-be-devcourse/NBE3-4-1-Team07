@@ -44,6 +44,7 @@ public class ProductService {
                     productReqDto.getPrice(),
                     productReqDto.getQuantity(),
                     productReqDto.getImgPath(),
+                    productReqDto.getDescription(),
                     adminOptional.get()
             );
             return productRepository.save(product);
@@ -68,6 +69,7 @@ public class ProductService {
             product.setQuantity(productReqDto.getQuantity());
             product.setModify_date(LocalDateTime.now());
             product.setImgPath(productReqDto.getImgPath());
+            product.setDescription(productReqDto.getDescription());
             return productRepository.save(product);
         }
         return null;
