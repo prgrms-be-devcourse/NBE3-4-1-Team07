@@ -20,8 +20,6 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final MailService mailService;
 
-
-
     // 주문 생성
     @Transactional
     public Order createOrder(OrderRequestDto orderRequestDto) {

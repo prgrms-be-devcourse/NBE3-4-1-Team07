@@ -31,18 +31,18 @@ public class Product {
     private LocalDateTime modify_date;
 
     private String imgPath;
-    private String description;
+
+
     @ManyToOne
     private Admin admin;
 
-    public Product(String name, int price, int quantity, String imgPath, String description, Admin admin) {
+    public Product(String name, int price, int quantity, String imgPath, Admin admin) {
         this.name = name;
         this.price = price;
         this.quantity = quantity;
         this.modify_date = LocalDateTime.now();
         this.created_date = LocalDateTime.now();
         this.imgPath = imgPath;
-        this.description = description;
         this.admin = admin;
     }
 

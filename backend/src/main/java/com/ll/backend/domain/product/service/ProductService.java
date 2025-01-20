@@ -7,7 +7,14 @@ import com.ll.backend.domain.product.entity.Product;
 import com.ll.backend.domain.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,7 +31,7 @@ public class ProductService {
         return productRepository.count();
     }
 
-    public List<Product> findAll(){
+    public List<Product> findAll() {
         return productRepository.findAll();
     }
 
@@ -32,19 +39,48 @@ public class ProductService {
         return productRepository.findById(id);
     }
 
+
+    public String saveImage(String name, MultipartFile image) {
+        try {
+            // 이미지 저장 경로 설정 (프로젝트 루트의 uploads 디렉토리)
+            String uploadDir = "src/main/resources/static/uploads";
+
+            String originalFilename = image.getOriginalFilename();
+            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+
+            String uniqueFileName = StringUtils.cleanPath(name) +extension;
+
+            // 디렉토리가 없으면 생성
+            Path uploadPath = Paths.get(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            // 이미지 저장
+            Path filePath = uploadPath.resolve(uniqueFileName);
+            Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            // 데이터베이스에 저장할 이미지 경로
+            return "/uploads/" + uniqueFileName;
+
+        } catch (IOException e) {
+            throw new RuntimeException("이미지 저장에 실패했습니다.", e);
+        }
+
+    }
+
     //ALTER TABLE PRODUCT AUTO_INCREMENT=1;
     //SET @COUNT = 0;
     //UPDATE PRODUCT SET PRODUCT_ID = @COUNT:=@COUNT+1;
     //추후에 id 업데이트
-    public Product saveProduct(ProductReqDto productReqDto, Principal principal) {
+    public Product saveProduct(ProductReqDto productReqDto, String imgPath, Principal principal) {
         Optional<Admin> adminOptional = adminRepository.findByUsername(principal.getName());
         if (adminOptional.isPresent()) {
             Product product = new Product(
                     productReqDto.getName(),
                     productReqDto.getPrice(),
                     productReqDto.getQuantity(),
-                    productReqDto.getImgPath(),
-                    productReqDto.getDescription(),
+                    imgPath,
                     adminOptional.get()
             );
             return productRepository.save(product);
@@ -52,15 +88,7 @@ public class ProductService {
         return null;
     }
 
-    public Product findByProductName(String productName) {
-        Optional<Product> product = productRepository.findByName(productName);
-        if (product.isPresent()) {
-            return product.get();
-        }
-        return null;
-    }
-
-    public Product modifyProduct(int id, ProductReqDto productReqDto) {
+    public Product modifyProduct(int id, ProductReqDto productReqDto, String imgPath) {
         Optional<Product> productOptional = productRepository.findById(id);
         if (productOptional.isPresent()) {
             Product product = productOptional.get();
@@ -68,8 +96,7 @@ public class ProductService {
             product.setPrice(productReqDto.getPrice());
             product.setQuantity(productReqDto.getQuantity());
             product.setModify_date(LocalDateTime.now());
-            product.setImgPath(productReqDto.getImgPath());
-            product.setDescription(productReqDto.getDescription());
+            product.setImgPath(imgPath);
             return productRepository.save(product);
         }
         return null;
