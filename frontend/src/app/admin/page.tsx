@@ -4,11 +4,12 @@ import React, { useEffect, useState } from "react";
 import {Order, OrderDetailResponseDto} from "../types/Order";
 import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
-import {Product, ProductResponseDto} from "@/app/types/Product";
+import {Product, ProductRequestDto, ProductResponseDto} from "@/app/types/Product";
 import OrderDetailModal from "@/app/admin/components/OrderDetailModal";
 import ProductDetailModal from "@/app/admin/components/ProductDetailModal";
 import ProductList from "@/app/admin/components/ProductList";
 import OrderList from "@/app/admin/components/OrderList";
+import ProductAddModal from "@/app/admin/components/ProductAddModal";
 
 const getOrderList = async () => {
   const res = await fetch("/api/admin/orderList");
@@ -37,8 +38,12 @@ export default function admin() {
     });
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+
   const [isProductDetailModalOpen, setIsProductDetailModalOpen] = useState(false);
+  const [isProductAddModalOpen, setIsProductAddModalOpen] = useState(false);
   const [isOrderDetailModalOpen, setIsOrderDetailModalOpen] = useState(false);
+
+
   const [formValues, setFormValues] = useState<Product | null>(null);
   const [orderDetail, setOrderDetail] = useState<OrderDetailResponseDto | null>(null);
   const [selectedOrders, setSelectedOrders] = useState<Set<number>>(new Set());
@@ -142,10 +147,37 @@ export default function admin() {
             console.error("상품 저장 오류 : " + error);
         }
     };
-  const handleAddProduct = () => {
 
+    const handleProductCreate = async (product: ProductRequestDto) => {
+        try {
+            const response = await fetch("/api/admin/product/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(product),
+            });
+
+            if (!response.ok) {
+                throw new Error("상품 추가에 실패했습니다.");
+            }
+
+            // 상품 목록 갱신
+            const data: ProductResponseDto = await getProductList();
+            setProducts(data.products);
+            alert("상품이 추가되었습니다.");
+            handleProductAddModalClose();
+        } catch (error) {
+            console.error("상품 추가 오류 : " + error);
+        }
+    };
+
+  const handleProductAddModalOpen = () => {
+      setFormValues(null);
+      setIsProductAddModalOpen(true);
   }
-
+  const handleProductAddModalClose = () => {
+      setFormValues(null);
+      setIsProductAddModalOpen(false);
+  }
   const handleOrderDetailModalOpen = async (id: number) => {
         try {
             const response: Response = await fetch(`/api/admin/order/${id}`);
@@ -246,9 +278,14 @@ export default function admin() {
           {activeMenu === "productList" && (
               <ProductList
                   products={products}
-                  onAddProductClick={handleAddProduct}
+                  onAddProductClick={handleProductAddModalOpen}
                   onProductDetailClick={handleProductDetailModalOpen}
               />)}
+            <ProductAddModal
+                open={isProductAddModalOpen}
+                onClose={handleProductAddModalClose}
+                onSave={handleProductCreate}
+            />
           <ProductDetailModal
               open={isProductDetailModalOpen}
               onClose={handleProductDetailModalClose}
