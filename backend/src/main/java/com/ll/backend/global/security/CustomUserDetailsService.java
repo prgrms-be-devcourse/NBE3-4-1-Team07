@@ -1,4 +1,4 @@
-package com.ll.backend.glodal.security;
+package com.ll.backend.global.security;
 
 import com.ll.backend.domain.admin.entity.Admin;
 import com.ll.backend.domain.admin.service.AdminService;

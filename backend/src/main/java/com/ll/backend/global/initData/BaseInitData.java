@@ -1,4 +1,4 @@
-package com.ll.backend.glodal.initData;
+package com.ll.backend.global.initData;
 
 import com.ll.backend.domain.admin.entity.Admin;
 import com.ll.backend.domain.admin.service.AdminService;
