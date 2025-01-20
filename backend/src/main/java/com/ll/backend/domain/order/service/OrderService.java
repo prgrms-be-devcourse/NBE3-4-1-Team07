@@ -1,13 +1,12 @@
 package com.ll.backend.domain.order.service;
 
 import com.ll.backend.domain.order.OrderStatus;
+import com.ll.backend.domain.order.dto.MailForm;
 import com.ll.backend.domain.order.dto.OrderDeliveryRequestDto;
 import com.ll.backend.domain.order.dto.OrderRequestDto;
 import com.ll.backend.domain.order.dto.OrderResponseDto;
 import com.ll.backend.domain.order.entity.Order;
 import com.ll.backend.domain.order.repository.OrderRepository;
-import com.ll.backend.domain.orderdetail.service.OrderDetailService;
-import com.ll.backend.domain.product.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,8 +18,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final ProductRepository productRepository;
-    private final OrderDetailService orderDetailService;
+    private final MailService mailService;
+
 
 
     // 주문 생성
@@ -78,8 +77,13 @@ public class OrderService {
 
             // 배송 상태를 SHIPPED로 변경
             order.setState(OrderStatus.SHIPPED);
+
+
+            MailForm mailForm = mailService.createMail(order.getEmail(), order.getOrderDetails());
+            mailService.sendMail(mailForm);
         }
     }
+
 }
 
 

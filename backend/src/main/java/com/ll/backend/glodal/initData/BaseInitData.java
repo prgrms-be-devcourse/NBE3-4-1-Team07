@@ -76,7 +76,7 @@ public class BaseInitData {
         productOrderDtoList.add(productOrderDto2);
 
         Order order1 = new Order(
-                "asd123@naver.com",
+                "cyr5080@naver.com",
                 "서울시 강남구 청담동",
                 "11111",
                 OrderStatus.PENDING,
