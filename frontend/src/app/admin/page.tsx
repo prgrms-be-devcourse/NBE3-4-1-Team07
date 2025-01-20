@@ -254,6 +254,8 @@ export default function admin() {
                 body: JSON.stringify(orderDeliveryDto),
             });
             alert("배송 처리 성공");
+            setSelectedOrders(new Set());
+            setSelectAll(null);
             // 수정 후 다시 조회
             await fetchOrders();
         } catch (error) {

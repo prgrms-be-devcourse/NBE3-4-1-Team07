@@ -75,7 +75,8 @@ const OrderList: React.FC<OrderListProps> = ({
                 <button className="bg-gray-800 text-white px-4 py-2 rounded">조회</button>
             </div>
 
-            <Button onClick={handleDelivery}>배송</Button>
+            <Button onClick={handleDelivery}
+            disabled={selectedOrders.size === 0}>배송</Button>
 
             {/* Order Table */}
             <div>
