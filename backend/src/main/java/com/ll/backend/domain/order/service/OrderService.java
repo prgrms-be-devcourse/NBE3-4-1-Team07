@@ -12,8 +12,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,30 +26,16 @@ public class OrderService {
     // 주문 생성
     @Transactional
     public Order createOrder(OrderRequestDto orderRequestDto) {
-
         // 주문 정보 생성
         Order order = new Order(
                 orderRequestDto.getEmail(),
                 orderRequestDto.getAddress(),
                 orderRequestDto.getPostalCode(),
-                setOrderStateBasedOnTime(),
+                OrderStatus.PENDING,
                 orderRequestDto.getTotalPrice()
         );
-
         // 주문 저장
         return orderRepository.save(order);
-
-    }
-
-    private OrderStatus setOrderStateBasedOnTime() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalTime cutoffTime = LocalTime.of(14, 0); // 오후 2시 기준
-
-        if (now.toLocalTime().isBefore(cutoffTime)) {
-            return OrderStatus.SHIPPED;
-        } else {
-            return OrderStatus.PENDING;
-        }
     }
 
     public long count() {
