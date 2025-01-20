@@ -46,6 +46,7 @@ spring:
             enable: true
 server:
   port: 8080
+
 logging:
   level:
     org.hibernate.SQL: DEBUG
@@ -53,4 +54,7 @@ logging:
     org.hibernate.orm.jdbc.extract: TRACE
     org.springframework.transaction.interceptor: TRACE
 
+    # 웹, 시큐리티 디버그
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
 

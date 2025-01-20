@@ -1,10 +1,12 @@
 package com.ll.backend.global.security;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -19,23 +21,23 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/admin/login").permitAll()
-                        .requestMatchers("/admin/**").permitAll()
                         .requestMatchers("/admin/**").authenticated()
                         .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
-                .csrf((csrf) -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
 //                        .ignoringRequestMatchers("/h2-console/**"))
                 .headers((headers) -> headers
                         .addHeaderWriter(new XFrameOptionsHeaderWriter(
                                 XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
                 .httpBasic(Customizer.withDefaults())// Basic Auth 활성화
-                .formLogin(formLogin -> formLogin
-                        .loginPage("/admin/login")
-                        .defaultSuccessUrl("/")
-                        .permitAll())
+                .formLogin(AbstractHttpConfigurer::disable) // spring security 기본 form login 비활성화
                 .logout(logout -> logout
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/admin/logout"))
-                        .logoutSuccessUrl("/")
-                        .invalidateHttpSession(true));
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/"))
+                        .deleteCookies("JSESSIONID")
+                        .invalidateHttpSession(true))
+                .sessionManagement(session -> session
+                        .invalidSessionUrl("/admin/login")
+                );
+
         return http.build();
     }
 
@@ -44,6 +46,4 @@ public class SecurityConfig {
     PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
-
-
 }

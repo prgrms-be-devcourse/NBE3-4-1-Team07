@@ -6,7 +6,13 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
 
-    const response = await fetch('http://localhost:8080/admin/orderList');
+    const response = await fetch('http://localhost:8080/admin/orderList', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',  // 쿠키 포함
+    });
     const rawData = await response.json();
 
     const orderList: Order[] = rawData.map((item: any) => ({
