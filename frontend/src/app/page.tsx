@@ -16,7 +16,30 @@ const getProductList = async () => {
 };
 
 export default function Home() {
+  // 초기 상태는 빈 배열로 설정
   const [cartItems, setCartItems] = useState<Product[]>([]);
+  
+  // 별도의 useEffect에서 localStorage 데이터 로드
+  useEffect(() => {
+    try {
+      const savedCart = localStorage.getItem('cartItems');
+      if (savedCart) {
+        setCartItems(JSON.parse(savedCart));
+      }
+    } catch (error) {
+      console.error('장바구니 데이터 로드 실패:', error);
+    }
+  }, []); // 컴포넌트 마운트 시 한 번만 실행
+
+  // localStorage 저장
+  useEffect(() => {
+    try {
+      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    } catch (error) {
+      console.error('장바구니 데이터 저장 실패:', error);
+    }
+  }, [cartItems]);
+
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [products, setProducts] = useState<Product[]>([]);
 
@@ -39,15 +62,14 @@ export default function Home() {
 
   const handleAddToCart = (product: Product) => {
     setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === product.id);
-      if (existingItem) {
-        return prevItems.map(item =>
+      const newItems = prevItems.find(item => item.id === product.id)
+        ? prevItems.map(item =>
             item.id === product.id
-                ? { ...item, quantity: item.quantity + 1 }
-                : item
-        );
-      }
-      return [...prevItems, { ...product, quantity: 1 }];
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          )
+        : [...prevItems, { ...product, quantity: 1 }];
+      return newItems;
     });
     setSelectedItems(prev => prev.filter(id => id !== product.id));
   };
