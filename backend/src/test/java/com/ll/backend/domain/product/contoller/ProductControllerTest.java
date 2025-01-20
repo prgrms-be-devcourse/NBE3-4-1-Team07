@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -67,20 +68,27 @@ class ProductControllerTest {
     @DisplayName("상품 등록")
     @WithMockUser(username = "user1")
     void t2() throws Exception {
-        ResultActions resultActions = mvc
-                .perform(
-                        post("/admin/product/create")
-                                .content("""
-                                        {
-                                             "name" : "디카페인 원두",
-                                             "price" : 12000,
-                                             "quantity" : 3,
-                                             "imgPath" : ""
-                                        }
-                                        """)
-                                .contentType(
-                                        new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8)
-                                )
+
+        // given
+        String name = "테스트 상품";
+        int price = 10000;
+        int quantity = 100;
+
+
+        MockMultipartFile image = new MockMultipartFile(
+                "image",
+                "test.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                "test image content".getBytes()
+        );
+
+        ResultActions resultActions = mvc.perform(
+                        multipart("/admin/product/create")
+                                .file(image)
+                                .param("name", name)
+                                .param("price", String.valueOf(price))
+                                .param("quantity", String.valueOf(quantity))
+                                .contentType(MediaType.MULTIPART_FORM_DATA)
                 )
                 .andDo(print());
 
@@ -94,12 +102,11 @@ class ProductControllerTest {
                 .andExpect(handler().handlerType(ProductController.class))
                 .andExpect(handler().methodName("createProduct"))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value(lastProduct.getName()))
-                .andExpect(jsonPath("$.created_date").value(Matchers.startsWith(lastProduct.getCreated_date().toString().substring(0, 20))))
-                .andExpect(jsonPath("$.modify_date").value(Matchers.startsWith(lastProduct.getModify_date().toString().substring(0, 20))))
-                .andExpect(jsonPath("$.price").value(lastProduct.getPrice()))
-                .andExpect(jsonPath("$.quantity").value(lastProduct.getQuantity()))
-                .andExpect(jsonPath("$.imgPath").value(lastProduct.getImgPath()));
+                .andExpect(header().exists("Location"))
+                .andExpect(jsonPath("$.name").value(name))
+                .andExpect(jsonPath("$.price").value(price))
+                .andExpect(jsonPath("$.quantity").value(quantity))
+                .andExpect(jsonPath("$.imgPath").exists());
     }
 
     @Test
@@ -107,20 +114,29 @@ class ProductControllerTest {
     @WithMockUser(username = "user1")
     void t3() throws Exception {
         int productId = 1;
-        ResultActions resultActions = mvc
-                .perform(
-                        put("/admin/product/{id}", productId)
-                                .content("""
-                                        {
-                                             "name" : "우간다 커피",
-                                             "price" : 9000,
-                                             "quantity" : 2,
-                                             "imgPath" : ""
-                                        }
-                                        """)
-                                .contentType(
-                                        new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8)
-                                )
+        String name = "수정된 상품";
+        int price = 20000;
+        int quantity = 50;
+
+        // Mock 이미지 파일 생성
+        MockMultipartFile image = new MockMultipartFile(
+                "image",
+                "test.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                "test image content".getBytes()
+        );
+
+        ResultActions resultActions = mvc.perform(
+                        multipart("/admin/product/{id}", productId)
+                                .file(image)
+                                .param("name", name)
+                                .param("price", String.valueOf(price))
+                                .param("quantity", String.valueOf(quantity))
+                                .contentType(MediaType.MULTIPART_FORM_DATA)
+                                .with(request -> {
+                                    request.setMethod("PUT");
+                                    return request;
+                                })
                 )
                 .andDo(print());
 
