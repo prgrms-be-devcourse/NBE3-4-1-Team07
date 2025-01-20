@@ -4,11 +4,11 @@ import com.ll.backend.domain.product.dto.ProductReqDto;
 import com.ll.backend.domain.product.entity.Product;
 import com.ll.backend.domain.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
 import java.security.Principal;
@@ -38,11 +38,15 @@ public class ProductController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/admin/product/create")
-    public ResponseEntity<Product> createProduct(@RequestBody ProductReqDto productReqDto, Principal principal){
-        Product product = productService.saveProduct(productReqDto, principal);
+    public ResponseEntity<Product> createProduct(@ModelAttribute ProductReqDto productReqDto,
+                                                 @RequestPart("image") MultipartFile image, Principal principal){
+        String defulatImgPath = "uploads/없음.png";
+        if(!image.isEmpty()){
+            defulatImgPath = productService.saveImage(productReqDto.getName(), image);
+        }
+        Product product = productService.saveProduct(productReqDto, defulatImgPath, principal);
         if(product == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -52,8 +56,14 @@ public class ProductController {
 
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/admin/product/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable int id, @RequestBody ProductReqDto productReqDto){
-        Product product = productService.modifyProduct(id, productReqDto);
+    public ResponseEntity<Product> updateProduct(@PathVariable int id,
+                                                 @ModelAttribute ProductReqDto productReqDto,
+                                                 @RequestPart("image") MultipartFile image){
+        String defulatImgPath = "uploads/없음.png";
+        if(!image.isEmpty()){
+            defulatImgPath = productService.saveImage(productReqDto.getName(), image);
+        }
+        Product product = productService.modifyProduct(id, productReqDto, defulatImgPath);
         if(product == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

@@ -9,6 +9,4 @@ public class ProductReqDto {
     private String name;
     private int price;
     private int quantity;
-    private String imgPath;
-    private String description;
 }
