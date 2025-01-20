@@ -107,6 +107,7 @@ const OrderList: React.FC<OrderListProps> = ({
                                     type="checkbox"
                                     checked={selectedOrders.has(order.id)}
                                     onChange={(e) => handleCheckboxChange(order.id, e.target.checked)}
+                                    disabled={order.state === 'SHIPPED'}
                                 />
                             </td>
                             <td className="border px-4 py-2">{order.id}</td>

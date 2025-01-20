@@ -205,7 +205,12 @@ export default function admin() {
     };
 
   const handleCheckboxChange = (orderId: number, isChecked: boolean) => {
-        setSelectedOrders((prevSelectedOrders) => {
+      const order = orders.find(order => order.id === orderId);
+      if (order && order.state === 'SHIPPED') {
+          return; // SHIPPED 상태인 주문은 변경되지 않음
+      }
+
+      setSelectedOrders((prevSelectedOrders) => {
             const updatedSelectedOrders = new Set(prevSelectedOrders);
             if (isChecked) {
                 updatedSelectedOrders.add(orderId);
@@ -217,13 +222,18 @@ export default function admin() {
         });
     };
   const handleSelectAllChange = (isChecked: boolean) => {
-        setSelectAll(isChecked);
-        if (isChecked) {
-            const allOrderIds = orders.map(order => order.id);
-            setSelectedOrders(new Set(allOrderIds));
-        } else {
-            setSelectedOrders(new Set());
-        }
+      setSelectAll(isChecked);
+
+      // SHIPPED 상태가 아닌 주문만 선택하기
+      const allOrderIds = orders
+          .filter(order => order.state !== 'SHIPPED')
+          .map(order => order.id);
+
+      if (isChecked) {
+          setSelectedOrders(new Set(allOrderIds));
+      } else {
+          setSelectedOrders(new Set());
+      }
     };
 
   const handleDelivery = async () => {
