@@ -42,6 +42,7 @@ public class OrderController {
     public ResponseEntity<String> updateOrderDeliveryStatus(@RequestBody OrderDeliveryRequestDto requestDto) {
         try {
             orderService.updateDeliveryStatus(requestDto);
+
             return ResponseEntity.ok("Delivery status updated successfully.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
