@@ -219,7 +219,7 @@ export default function Home() {
                       <div className="flex items-center gap-4">
                         <div className="w-20 h-20 relative">
                           <Image
-                              src={`http://localhost:8080/${product.imgPath}`}
+                              src={`http://localhost:8080${product.imgPath}`}
                               alt={product.name}
                               fill
                               className="object-cover rounded-lg"

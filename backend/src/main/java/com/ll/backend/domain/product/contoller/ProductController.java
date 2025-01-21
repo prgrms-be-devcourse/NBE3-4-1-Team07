@@ -42,9 +42,9 @@ public class ProductController {
     @PostMapping("/admin/product/create")
     public ResponseEntity<Product> createProduct(@ModelAttribute ProductReqDto productReqDto,
                                                  @RequestPart("image") MultipartFile image, Principal principal){
-        String defulatImgPath = "uploads/없음.png";
+        String defulatImgPath = "uploads/none.png";
         if(!image.isEmpty()){
-            defulatImgPath = productService.saveImage(productReqDto.getName(), image);
+            defulatImgPath = productService.saveImage(image);
         }
         Product product = productService.saveProduct(productReqDto, defulatImgPath, principal);
         if(product == null){
@@ -59,9 +59,9 @@ public class ProductController {
     public ResponseEntity<Product> updateProduct(@PathVariable int id,
                                                  @ModelAttribute ProductReqDto productReqDto,
                                                  @RequestPart("image") MultipartFile image){
-        String defulatImgPath = "uploads/없음.png";
+        String defulatImgPath = "uploads/none.png";
         if(!image.isEmpty()){
-            defulatImgPath = productService.saveImage(productReqDto.getName(), image);
+            defulatImgPath = productService.saveImage(image);
         }
         Product product = productService.modifyProduct(id, productReqDto, defulatImgPath);
         if(product == null){
