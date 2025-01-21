@@ -16,10 +16,9 @@ async function fetchProducts(): Promise<Product[]> {
       imgPath: item.imgPath,
       created_date: item.created_date,
       modify_date: item.modify_date,
-      description: item.description,
-      admin: {
-        id: item.admin.id,
-      }
+      // admin: {
+      //   id: item.admin.id,
+      // }
     }));
 
     return products;
