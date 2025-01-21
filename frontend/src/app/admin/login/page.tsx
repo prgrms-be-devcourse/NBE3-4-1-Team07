@@ -12,31 +12,38 @@ export default function AdminLogin() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setLoginInfo(prev => ({
+    setLoginInfo((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
-      const response = await fetch("/api/admin/login", {
+      const response = await fetch("http://localhost:8080/admin/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(loginInfo),
       });
 
       const data = await response.json();
+<<<<<<< Updated upstream
       console.log('로그인 응답:', data);
+=======
+      console.log("로그인 응답:", data); // 응답 확인용 로그
+>>>>>>> Stashed changes
 
       if (!response.ok) {
         throw new Error(data.message || "로그인 실패");
       }
 
+<<<<<<< Updated upstream
       if (data.message.includes("Welcome")) {
         alert("로그인 성공");
         router.push("/admin");
@@ -47,6 +54,19 @@ export default function AdminLogin() {
     } catch (error) {
       console.error("로그인 오류:", error);
       alert(error instanceof Error ? error.message : "로그인에 실패했습니다.");
+=======
+      if (response.ok) {
+        // 로그인 성공
+        alert("로그인 성공");
+        router.push("/admin");
+      }
+    } catch (error) {
+      console.error("로그인 오류:", error);
+      alert(
+        error.message ||
+          "로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요."
+      );
+>>>>>>> Stashed changes
     }
   };
 
@@ -54,10 +74,13 @@ export default function AdminLogin() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-96">
         <h1 className="text-2xl font-bold text-center mb-6">관리자 로그인</h1>
-        
+
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-700"
+            >
               아이디
             </label>
             <input
@@ -72,7 +95,10 @@ export default function AdminLogin() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
               비밀번호
             </label>
             <input
@@ -96,4 +122,4 @@ export default function AdminLogin() {
       </div>
     </div>
   );
-} 
+}

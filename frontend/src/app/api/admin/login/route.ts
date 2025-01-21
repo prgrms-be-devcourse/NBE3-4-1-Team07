@@ -5,10 +5,15 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { username, password } = body;
 
+<<<<<<< Updated upstream
         console.log('로그인 시도:', { username, password });
 
         // Spring 서버로 요청 전달
         const response = await fetch("http://localhost:8080/api/admin/login", {
+=======
+        // 서버로 로그인 요청
+        const response = await fetch("http://localhost:8080/admin/login", {
+>>>>>>> Stashed changes
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
