@@ -305,7 +305,8 @@ export default function admin() {
                 onClick={() => handleMenuClick("orderList")}
                 icon={<FormatListBulletedOutlinedIcon/>}>주문목록조회</MenuItem>
             <MenuItem
-                onClick={() => handleMenuClick("productList")}>등록상품조회</MenuItem>
+                onClick={() => handleMenuClick("productList")}
+                icon{<CategoryIcon/>}>등록상품조회</MenuItem>
           </Menu>
         </Sidebar>
         <div className="w-3/4 p-4 flex-grow overflow-auto">

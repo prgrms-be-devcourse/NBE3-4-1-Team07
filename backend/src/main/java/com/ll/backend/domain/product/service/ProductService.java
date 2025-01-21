@@ -75,18 +75,24 @@ public class ProductService {
     //UPDATE PRODUCT SET PRODUCT_ID = @COUNT:=@COUNT+1;
     //추후에 id 업데이트
     public Product saveProduct(ProductReqDto productReqDto, String imgPath, Principal principal) {
-        Optional<Admin> adminOptional = adminRepository.findByUsername(principal.getName());
-        if (adminOptional.isPresent()) {
-            Product product = new Product(
-                    productReqDto.getName(),
-                    productReqDto.getPrice(),
-                    productReqDto.getQuantity(),
-                    imgPath,
-                    adminOptional.get()
-            );
-            return productRepository.save(product);
-        }
-        return null;
+        //Optional<Admin> adminOptional = adminRepository.findByUsername(principal.getName());
+//        if (adminOptional.isPresent()) {
+//            Product product = new Product(
+//                    productReqDto.getName(),
+//                    productReqDto.getPrice(),
+//                    productReqDto.getQuantity(),
+//                    imgPath,
+//                    adminOptional.get()
+//            );
+//            return productRepository.save(product);
+//        }
+        Product product = new Product(
+                productReqDto.getName(),
+                productReqDto.getPrice(),
+                productReqDto.getQuantity(),
+                imgPath
+        );
+        return productRepository.save(product);
     }
 
     public Product modifyProduct(int id, ProductReqDto productReqDto, String imgPath) {
@@ -97,7 +103,7 @@ public class ProductService {
             product.setPrice(productReqDto.getPrice());
             product.setQuantity(productReqDto.getQuantity());
             product.setModify_date(LocalDateTime.now());
-            product.setImgPath(imgPath);
+            //product.setImgPath(imgPath);
             return productRepository.save(product);
         }
         return null;

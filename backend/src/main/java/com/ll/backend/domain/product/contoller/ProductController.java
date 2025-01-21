@@ -38,7 +38,6 @@ public class ProductController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PreAuthorize("isAuthenticated()")
     @PostMapping("/admin/product/create")
     public ResponseEntity<Product> createProduct(@ModelAttribute ProductReqDto productReqDto,
                                                  @RequestPart("image") MultipartFile image, Principal principal){
@@ -54,15 +53,16 @@ public class ProductController {
         return ResponseEntity.created(location).body(product);
     }
 
-    @PreAuthorize("isAuthenticated()")
+
     @PutMapping("/admin/product/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable int id,
-                                                 @ModelAttribute ProductReqDto productReqDto,
-                                                 @RequestPart("image") MultipartFile image){
-        String defulatImgPath = "uploads/none.png";
-        if(!image.isEmpty()){
-            defulatImgPath = productService.saveImage(image);
-        }
+                                                 @RequestBody ProductReqDto productReqDto
+                                                 //@RequestPart("image") MultipartFile image
+    ){
+        String defulatImgPath = "/uploads/none.png";
+//        if(!image.isEmpty()){
+//            defulatImgPath = productService.saveImage(image);
+//        }
         Product product = productService.modifyProduct(id, productReqDto, defulatImgPath);
         if(product == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -70,7 +70,7 @@ public class ProductController {
         return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
-    @PreAuthorize("isAuthenticated()")
+
     @DeleteMapping("/admin/product/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable int id){
         productService.deleteProduct(id);

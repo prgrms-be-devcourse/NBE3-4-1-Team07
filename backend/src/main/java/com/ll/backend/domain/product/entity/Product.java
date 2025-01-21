@@ -46,4 +46,12 @@ public class Product {
         this.admin = admin;
     }
 
+    public Product(String name, int price, int quantity, String imgPath) {
+        this.name = name;
+        this.price = price;
+        this.quantity = quantity;
+        this.modify_date = LocalDateTime.now();
+        this.created_date = LocalDateTime.now();
+        this.imgPath = imgPath;
+    }
 }
