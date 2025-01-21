@@ -16,6 +16,6 @@ export interface ProductRequestDto {
   price: number;
   quantity: number;
   description: string;
-  imgPath: string;
+  image: File | null;
 }
 

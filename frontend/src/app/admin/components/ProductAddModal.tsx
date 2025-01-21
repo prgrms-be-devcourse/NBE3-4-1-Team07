@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Modal, Box, FormControl, TextField, Button } from '@mui/material';
 import Image from 'next/image';
-import {Product, ProductRequestDto} from "@/app/types/Product";
+import {ProductRequestDto} from "@/app/types/Product";
+import ImageFileUploader from "@/app/admin/components/ImageFileUploader";
 
 interface ProductAddModalProps {
     open: boolean;
@@ -14,14 +15,32 @@ const ProductAddModal: React.FC<ProductAddModalProps> = ({
                                                              onClose,
                                                              onSave
                                                          }) => {
-    const [formValues, setFormValues] = useState<Product>({
-        id: -1,
+    const [formValues, setFormValues] = useState<ProductRequestDto>({
         name: '',
         price: 0,
         description: '',
         quantity: 0,
-        imgPath: '',
+        image: null,
     });
+
+    const handleProductAddModalClose = () => {
+        // 초기화
+        setFormValues({
+            name: '',
+            price: 0,
+            description: '',
+            quantity: 0,
+            image: null,
+        });
+        onClose();
+    }
+
+    const handleImageSelect = (file: File) => {
+        setFormValues(prevValues => ({
+            ...prevValues,
+            image: file
+        }));
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -41,18 +60,17 @@ const ProductAddModal: React.FC<ProductAddModalProps> = ({
             price: formValues.price,
             quantity: formValues.quantity,
             description: formValues.description || "",
-            imgPath: formValues.imgPath || "",
+            image: formValues.image || null,
         }
 
         onSave(requestBody);
         onClose();
         setFormValues({
-            id: -1,
             name: '',
             price: 0,
             description: '',
             quantity: 0,
-            imgPath: '',
+            image: null,
         });
     };
 
@@ -75,26 +93,40 @@ const ProductAddModal: React.FC<ProductAddModalProps> = ({
                 }}
             >
                 <Box style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
-                    <Box
-                        style={{
-                            width: "150px",
-                            height: "150px",
-                            position: "relative",
-                            border: "1px solid #ddd",
-                            borderRadius: "8px",
-                            overflow: "hidden",
-                        }}
-                    >
-                        {formValues.imgPath && (
-                            <Image
-                                src={formValues.imgPath}
-                                alt={formValues.name}
-                                layout="fill"
-                                objectFit="cover"
-                            />
-                        )}
-                    </Box>
-                    <Box style={{ flex: 1 }}>
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px'
+                    }}>
+                        <Box
+                            style={{
+                                width: "150px",
+                                height: "150px",
+                                position: "relative",
+                                border: "1px solid #ddd",
+                                borderRadius: "8px",
+                                overflow: "hidden",
+                            }}
+                        >
+                            {formValues.image && (
+                                <Image
+                                    src={URL.createObjectURL(formValues.image)}
+                                    alt={formValues.name}
+                                    width={150}
+                                    height={150}
+                                />
+                            )}
+                        </Box>
+                        <Box style={{ textAlign: "center", marginTop: "8px" }}>
+                            <label htmlFor="upload-button">
+                                <input accept="image/*" style={{ display: 'none' }} id="upload-button" type="file" />
+                                <ImageFileUploader onImageSelect={handleImageSelect} />
+                            </label>
+                        </Box>
+                    </div>
+                    <Box style={{flex: 1}}>
                         <FormControl fullWidth>
                             <TextField
                                 label="상품명"
@@ -135,7 +167,7 @@ const ProductAddModal: React.FC<ProductAddModalProps> = ({
                     <Button variant="contained" color="primary" onClick={handleSave}>
                         저장
                     </Button>
-                    <Button variant="outlined" onClick={onClose}>
+                    <Button variant="outlined" onClick={handleProductAddModalClose}>
                         닫기
                     </Button>
                 </Box>
