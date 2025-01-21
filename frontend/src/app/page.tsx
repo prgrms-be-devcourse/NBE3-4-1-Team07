@@ -116,11 +116,13 @@ export default function Home() {
         postalCode: orderInfo.postcode,
         totalPrice: calculateTotal(),
         products: cartItems.map(item => ({
-          id: item.id,
+          productId: item.id,
           quantity: item.quantity
         }))
       };
       
+      // 장바구니 상품 ID 확인을 위한 로그 추가
+      console.log('장바구니 상품 ID 목록:', cartItems.map(item => item.id));
       console.log('서버로 보내는 데이터:', orderData);
       console.log('JSON 형태:', JSON.stringify(orderData, null, 2));
 

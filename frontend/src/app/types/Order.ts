@@ -20,7 +20,7 @@ export interface OrderRequestDto {
   postalCode: string;
   totalPrice: number;
   products: {
-    id: number;
+    productId: number;
     quantity: number;
   }[];
 }
