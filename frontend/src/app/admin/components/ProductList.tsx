@@ -26,7 +26,6 @@ const ProductList: React.FC<ProductListProps> = ({
                                    fill
                                    className="object-cover rounded-lg"
                                    sizes="(max-width: 768px) 80px, 80px" />
-
                         </div>
                         <div>
                             <h6 className="font-semibold">{product.name}</h6>
