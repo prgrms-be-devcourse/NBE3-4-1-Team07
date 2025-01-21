@@ -4,7 +4,7 @@ import {Product} from "@/app/types/Product";
 
 // GET /api/admin/product/${id}
 export async function GET(request: NextRequest, { params }: { params: { id: number } }) {
-    const { id } = params;
+    const { id } = await params;
     const res = await fetch(`http://localhost:8080/admin/product/${id}`);
     const product: Product = await res.json();
 

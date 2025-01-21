@@ -49,7 +49,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     >
                         {formValues?.imgPath && (
                             <Image
-                                src={formValues.imgPath}
+                                src={"http://localhost:8080" + formValues.imgPath}
                                 alt={formValues.name}
                                 layout="fill"
                                 objectFit="cover"
