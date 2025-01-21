@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, ChangeEvent } from "react";
 import {Order, OrderDetailResponseDto} from "../types/Order";
 import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
@@ -84,7 +84,7 @@ export default function admin() {
     };
 
   const handleMenuClick = (menu: string) => setActiveMenu(menu);
-  const handleFilterChange = (e) => {
+  const handleFilterChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFilters({ ...filters, [name]: value });
   };
@@ -266,8 +266,7 @@ export default function admin() {
             });
             alert("배송 처리 성공");
             setSelectedOrders(new Set());
-            setSelectAll(null);
-            // 수정 후 다시 조회
+            setSelectAll(false);
             await fetchOrders();
         } catch (error) {
             alert("배송 처리 중 문제가 발생했습니다.");
