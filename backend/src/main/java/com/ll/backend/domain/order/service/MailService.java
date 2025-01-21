@@ -17,7 +17,6 @@ public class MailService {
     private static final StringBuilder message = new StringBuilder("안녕하세요. [CoffeeBean] 주문 배송 안내 메일입니다. "
             + "\n" + "고객님께서 주문하신 제품의 배송이 오늘 시작되었습니다."
             + "\n" + "고객님의 소중한 주문에 감사드리며, 더 나은 서비스를 위해 최선을 다하겠습니다."
-            + "\n" + "문의 사항이 있으시면 언제든지 연락 주시기 바랍니다."
             + "\n" + "문의 사항이 있으시면 언제든지 연락 주시기 바랍니다." + "\n"
             + "\n" + "주문 내역은 아래에서 확인하시 수 있습니다." + "\n");
 

@@ -18,8 +18,8 @@ public class OrderDetailController {
     private final OrderDetailService orderDetailService;
 
     @GetMapping("/admin/order/{id}")
-    public ResponseEntity<List<OrderDetailResponseDto>> getOrderDetail(@PathVariable String id){
-        List<OrderDetailResponseDto> orderDetail = orderDetailService.getOrderDetail(Integer.parseInt(id));
+    public ResponseEntity<List<OrderDetailResponseDto>> getOrderDetail(@PathVariable int id){
+        List<OrderDetailResponseDto> orderDetail = orderDetailService.getOrderDetail(id);
         if(orderDetail.isEmpty()){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

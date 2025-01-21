@@ -19,6 +19,7 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +41,7 @@ public class ProductService {
     }
 
 
-    public String saveImage(String name, MultipartFile image) {
+    public String saveImage(MultipartFile image) {
         try {
             // 이미지 저장 경로 설정 (프로젝트 루트의 uploads 디렉토리)
             String uploadDir = "src/main/resources/static/uploads";
@@ -48,7 +49,8 @@ public class ProductService {
             String originalFilename = image.getOriginalFilename();
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
 
-            String uniqueFileName = StringUtils.cleanPath(name) +extension;
+            String uniqueFileName = StringUtils.cleanPath(UUID.randomUUID().toString()) +extension;
+//            String uniqueFileName = UUID.randomUUID().toString() + extension;
 
             // 디렉토리가 없으면 생성
             Path uploadPath = Paths.get(uploadDir);
