@@ -3,27 +3,29 @@ import {ProductRequestDto} from "@/app/types/Product";
 
 export async function POST(request: NextRequest) {
     try {
-        // 요청 바디를 파싱
-        const body: ProductRequestDto = await request.json();
+        const formData = await request.formData();
+
+
+        const name = formData.get("name")?.toString() || "";
+        const price = parseFloat(formData.get("price")?.toString() || "0");
+        const quantity = parseInt(formData.get("quantity")?.toString() || "0", 10);
+        const description = formData.get("description")?.toString() || "";
+        const image = formData.get("image");
 
         // 유효성 검사
-        if (!body.name ||
-            body.price <= 0 ||
-            !body.quantity) {
+        if (!name || price <= 0 || quantity <= 0) {
             return NextResponse.json(
                 {message: "유효하지 않은 데이터입니다."},
                 {status: 400}
             );
         }
 
-
         const response = await fetch(`http://localhost:8080/admin/product/create`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
                 "Authorization": `Bearer ${process.env.REACT_APP_SERVER_ID}`
             },
-            body: JSON.stringify(body),
+            body: formData,
         });
 
         if (response.ok) {

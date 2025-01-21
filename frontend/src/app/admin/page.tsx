@@ -148,12 +148,23 @@ export default function admin() {
         }
     };
 
-    const handleProductCreate = async (product: ProductRequestDto) => {
+    const handleProductCreate = async (productRequestDto: ProductRequestDto) => {
         try {
+
+            const formData = new FormData();
+
+            if (productRequestDto.image) {
+                formData.append("image", productRequestDto.image);
+            }
+
+            formData.append("name", productRequestDto.name);
+            formData.append("price", productRequestDto.price.toString());
+            formData.append("quantity", productRequestDto.quantity.toString());
+            formData.append("description", productRequestDto.description || "");
+
             const response = await fetch("/api/admin/product/create", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(product),
+                body: formData,
             });
 
             if (!response.ok) {

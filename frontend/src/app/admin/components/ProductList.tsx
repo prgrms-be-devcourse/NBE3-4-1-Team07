@@ -21,13 +21,12 @@ const ProductList: React.FC<ProductListProps> = ({
                 <li key={product.id} className="flex justify-between items-center p-3 border rounded-lg hover:bg-gray-50">
                     <div className="flex items-center gap-4">
                         <div className="w-20 h-20 relative">
-                            <Image
-                                src={product.imgPath}
-                                alt={product.name}
-                                fill
-                                className="object-cover rounded-lg"
-                                sizes="(max-width: 768px) 80px, 80px"
-                            />
+                            <Image src={`http://localhost:8080/${product.imgPath}`}
+                                   alt={product.name}
+                                   fill
+                                   className="object-cover rounded-lg"
+                                   sizes="(max-width: 768px) 80px, 80px" />
+
                         </div>
                         <div>
                             <h6 className="font-semibold">{product.name}</h6>
