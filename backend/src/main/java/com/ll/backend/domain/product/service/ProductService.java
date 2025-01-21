@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,8 +45,7 @@ public class ProductService {
     public String saveImage(MultipartFile image) {
         try {
             // 이미지 저장 경로 설정 (프로젝트 루트의 uploads 디렉토리)
-            String uploadDir = "src/main/resources/static/uploads";
-
+            String uploadDir = new File("backend/src/main/resources/static/uploads").getCanonicalPath();
             String originalFilename = image.getOriginalFilename();
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
 
@@ -68,7 +68,6 @@ public class ProductService {
         } catch (IOException e) {
             throw new RuntimeException("이미지 저장에 실패했습니다.", e);
         }
-
     }
 
     //ALTER TABLE PRODUCT AUTO_INCREMENT=1;
