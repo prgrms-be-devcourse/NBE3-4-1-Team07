@@ -51,18 +51,17 @@ export default function admin() {
 
 
   useEffect(() => {
-    // 데이터 fetching
     const fetchData = async () => {
       try {
         if(activeMenu == "orderList"){
           const data = await getOrderList();
-          setOrders(data);
+          setOrders(Array.isArray(data) ? data : []);
         } else if(activeMenu == "productList"){
           const data: ProductResponseDto = await getProductList();
           setProducts(data.products);
         }
       } catch (err) {
-        console.log("데이터를 가져오는 데 문제가 발생했습니다.");
+        console.error("데이터를 가져오는 데 문제가 발생했습니다.", err);
       }
     };
 

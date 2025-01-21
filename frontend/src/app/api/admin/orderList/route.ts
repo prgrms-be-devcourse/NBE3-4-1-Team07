@@ -5,11 +5,24 @@ import { NextResponse } from "next/server";
 // GET /admin/orderList
 export async function GET() {
   try {
+    const response = await fetch('http://localhost:8080/api/admin/orderList', {
+      credentials: 'include',  // 쿠키 포함
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      }
+    });
 
-    const response = await fetch('http://localhost:8080/admin/orderList');
+    if (!response.ok) {
+      throw new Error('주문 목록 조회 실패');
+    }
+
     const rawData = await response.json();
+    
+    // 응답이 이미 배열인지 확인
+    const ordersData = Array.isArray(rawData) ? rawData : rawData.orders;
 
-    const orderList: Order[] = rawData.map((item: any) => ({
+    const orderList: Order[] = ordersData.map((item: any) => ({
       id: item.id,
       email: item.email,
       address: item.address,
@@ -22,7 +35,10 @@ export async function GET() {
     return NextResponse.json(orderList);
   } catch (error) {
     console.error('주문 목록 조회 실패:', error);
-    throw error;
+    return NextResponse.json(
+      { message: "주문 목록 조회 실패" },
+      { status: 500 }
+    );
   }
 }
 
