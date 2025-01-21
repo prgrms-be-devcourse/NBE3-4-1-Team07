@@ -1,12 +1,5 @@
 "use client";
 
-<<<<<<< Updated upstream
-import React, { useEffect, useState } from "react";
-import {Order, OrderDetailResponseDto} from "../types/Order";
-import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar';
-import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined';
-import {Product, ProductRequestDto, ProductResponseDto} from "@/app/types/Product";
-=======
 import React, { useEffect, useState, ChangeEvent } from "react";
 import { Order, OrderDetailResponseDto } from "../types/Order";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
@@ -16,7 +9,6 @@ import {
   ProductRequestDto,
   ProductResponseDto,
 } from "@/app/types/Product";
->>>>>>> Stashed changes
 import OrderDetailModal from "@/app/admin/components/OrderDetailModal";
 import ProductDetailModal from "@/app/admin/components/ProductDetailModal";
 import ProductList from "@/app/admin/components/ProductList";
@@ -67,22 +59,18 @@ export default function admin() {
   const [selectAll, setSelectAll] = useState(false);
 
   useEffect(() => {
+    // 데이터 fetching
     const fetchData = async () => {
       try {
         if (activeMenu == "orderList") {
           const data = await getOrderList();
-<<<<<<< Updated upstream
-          setOrders(Array.isArray(data) ? data : []);
-        } else if(activeMenu == "productList"){
-=======
           setOrders(data);
         } else if (activeMenu == "productList") {
->>>>>>> Stashed changes
           const data: ProductResponseDto = await getProductList();
           setProducts(data.products);
         }
       } catch (err) {
-        console.error("데이터를 가져오는 데 문제가 발생했습니다.", err);
+        console.log("데이터를 가져오는 데 문제가 발생했습니다.");
       }
     };
 
@@ -104,13 +92,9 @@ export default function admin() {
   };
 
   const handleMenuClick = (menu: string) => setActiveMenu(menu);
-<<<<<<< Updated upstream
-  const handleFilterChange = (e) => {
-=======
   const handleFilterChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
->>>>>>> Stashed changes
     const { name, value } = e.target;
     setFilters({ ...filters, [name]: value });
   };
@@ -282,24 +266,6 @@ export default function admin() {
         return;
       }
 
-<<<<<<< Updated upstream
-            const res = await fetch("/api/admin/delivery", {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(orderDeliveryDto),
-            });
-            alert("배송 처리 성공");
-            setSelectedOrders(new Set());
-            setSelectAll(null);
-            // 수정 후 다시 조회
-            await fetchOrders();
-        } catch (error) {
-            alert("배송 처리 중 문제가 발생했습니다.");
-        }
-    };
-=======
       const res = await fetch("/api/admin/delivery", {
         method: "PUT",
         headers: {
@@ -315,7 +281,6 @@ export default function admin() {
       alert("배송 처리 중 문제가 발생했습니다.");
     }
   };
->>>>>>> Stashed changes
 
   return (
     <div className="flex h-screen">

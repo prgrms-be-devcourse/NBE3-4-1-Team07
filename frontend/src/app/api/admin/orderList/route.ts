@@ -17,10 +17,6 @@ export async function GET() {
       throw new Error('주문 목록 조회 실패');
     }
 
-<<<<<<< Updated upstream
-=======
-    const response = await fetch('admin/orderList');
->>>>>>> Stashed changes
     const rawData = await response.json();
     
     // 응답이 이미 배열인지 확인

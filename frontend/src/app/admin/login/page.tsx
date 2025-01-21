@@ -33,28 +33,12 @@ export default function AdminLogin() {
       });
 
       const data = await response.json();
-<<<<<<< Updated upstream
-      console.log('로그인 응답:', data);
-=======
       console.log("로그인 응답:", data); // 응답 확인용 로그
->>>>>>> Stashed changes
 
       if (!response.ok) {
         throw new Error(data.message || "로그인 실패");
       }
 
-<<<<<<< Updated upstream
-      if (data.message.includes("Welcome")) {
-        alert("로그인 성공");
-        router.push("/admin");
-      } else {
-        throw new Error(data.message || "로그인 실패");
-      }
-
-    } catch (error) {
-      console.error("로그인 오류:", error);
-      alert(error instanceof Error ? error.message : "로그인에 실패했습니다.");
-=======
       if (response.ok) {
         // 로그인 성공
         alert("로그인 성공");
@@ -66,7 +50,6 @@ export default function AdminLogin() {
         error.message ||
           "로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요."
       );
->>>>>>> Stashed changes
     }
   };
 
