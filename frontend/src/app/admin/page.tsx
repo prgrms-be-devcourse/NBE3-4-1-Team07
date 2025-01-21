@@ -129,7 +129,11 @@ export default function admin() {
                 const response = await fetch(`/api/admin/product/${formValues?.id}`, {
                     method: "PUT",
                     headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify(formValues),
+                    body: JSON.stringify({
+                        name: formValues.name,
+                        price: formValues.price,
+                        quantity: formValues.quantity,
+                    }),
                 });
 
                 if (!response.ok) {
@@ -147,6 +151,26 @@ export default function admin() {
             console.error("상품 저장 오류 : " + error);
         }
     };
+
+    const handleProductDelete = async (id: number) => {
+        try{
+            const response = await fetch(`api/admin/product/${id}`, {
+                method: "DELETE",
+            });
+
+
+            if(!response.ok){
+                throw new Error("상품 삭제 실패.");
+            }
+
+            const data: ProductResponseDto = await getProductList();
+            setProducts(data.products);
+            return data;
+        } catch(error){
+            console.error(error);
+            return null;
+        }
+    }
 
     const handleProductCreate = async (productRequestDto: ProductRequestDto) => {
         try {
@@ -302,6 +326,7 @@ export default function admin() {
                   products={products}
                   onAddProductClick={handleProductAddModalOpen}
                   onProductDetailClick={handleProductDetailModalOpen}
+                  onProductDeleteClick={handleProductDelete}
               />)}
             <ProductAddModal
                 open={isProductAddModalOpen}
